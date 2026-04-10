@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design &amp; Technology: Product Design</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --blue: #007AFF;
+    --orange: #FF9500;
+    --green: #34C759;
+    --red: #FF3B30;
+    --bg: #F2F2F7;
+    --card-bg: #FFFFFF;
+    --text: #1C1C1E;
+    --text-secondary: #6C6C70;
+    --text-tertiary: #AEAEB2;
+    --border: #E5E5EA;
+    --radius: 14px;
+    --radius-sm: 10px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1C1C1E;
+      --card-bg: #2C2C2E;
+      --text: #FFFFFF;
+      --text-secondary: #AEAEB2;
+      --text-tertiary: #6C6C70;
+      --border: #38383A;
+    }
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+
+  #app {
+    width: 100%;
+    max-width: 480px;
+    min-height: 100vh;
+    background: var(--card-bg);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Screens */
+  .screen {
+    display: none;
+    flex-direction: column;
+    flex: 1;
+    padding: 0;
+    animation: fadeIn 0.3s ease;
+  }
+  .screen.active { display: flex; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Header */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px 8px;
+  }
+  .back-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    color: var(--blue);
+    font-size: 15px;
+    cursor: pointer;
+    padding: 4px 0;
+  }
+  .back-btn svg { width: 10px; height: 16px; }
+
+  /* Buttons */
+  .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 16px 20px;
+    border-radius: var(--radius-sm);
+    border: none;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    transition: opacity 0.15s, transform 0.15s;
+  }
+  .btn:active { opacity: 0.8; transform: scale(0.98); }
+  .btn-blue { background: var(--blue); color: white; }
+  .btn-orange { background: var(--orange); color: white; }
+  .btn-outline { background: var(--bg); color: var(--blue); border: 1.5px solid var(--blue); }
+
+  /* Menu row button */
+  .menu-btn {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    border-radius: var(--radius);
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+    transition: opacity 0.15s, transform 0.15s;
+    gap: 12px;
+  }
+  .menu-btn:active { opacity: 0.8; transform: scale(0.98); }
+  .menu-btn-blue { background: var(--blue); color: white; }
+  .menu-btn-orange { background: var(--orange); color: white; }
+  .menu-btn .icon { font-size: 24px; width: 32px; text-align: center; }
+  .menu-btn .label { flex: 1; }
+  .menu-btn .label strong { display: block; font-size: 16px; margin-bottom: 2px; }
+  .menu-btn .label span { font-size: 13px; opacity: 0.85; }
+  .menu-btn .chevron { font-size: 14px; opacity: 0.7; }
+
+  /* Progress bar */
+  .progress-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin: 4px 20px 0;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--blue);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+
+  /* Quiz header */
+  .quiz-header {
+    padding: 12px 20px 0;
+  }
+  .quiz-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .quiz-meta span {
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+  .quiz-meta .score {
+    font-weight: 600;
+    color: var(--text-secondary);
+    transition: transform 0.2s;
+  }
+  .quiz-meta .score.bounce {
+    animation: scoreBounce 0.4s;
+  }
+  @keyframes scoreBounce {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.4); }
+    100% { transform: scale(1); }
+  }
+  .menu-link-btn {
+    background: none;
+    border: none;
+    color: var(--blue);
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  /* Question */
+  .quiz-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 20px 100px;
+  }
+  .question-text {
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.4;
+    margin-bottom: 24px;
+  }
+  .answers {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .answer-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-radius: var(--radius-sm);
+    border: 2px solid transparent;
+    background: var(--bg);
+    cursor: pointer;
+    text-align: left;
+    font-size: 15px;
+    color: var(--text);
+    line-height: 1.4;
+    transition: background 0.25s, border-color 0.25s, transform 0.15s;
+    gap: 10px;
+  }
+  .answer-btn span { flex: 1; }
+  .answer-btn .answer-icon { font-size: 18px; min-width: 22px; text-align: center; }
+  .answer-btn:active { transform: scale(0.97); }
+  .answer-btn:disabled { cursor: default; }
+  .answer-btn.selected { border-color: var(--blue); background: rgba(0,122,255,0.08); }
+  .answer-btn.correct { background: rgba(52,199,89,0.12); border-color: var(--green); }
+  .answer-btn.wrong { background: rgba(255,59,48,0.12); border-color: var(--red); }
+
+  /* Feedback */
+  .feedback {
+    padding: 14px 16px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-top: 8px;
+    animation: popIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  .feedback.correct { background: rgba(52,199,89,0.1); }
+  .feedback.wrong { background: rgba(255,59,48,0.1); }
+  .feedback .fb-icon { font-size: 22px; }
+  .feedback .fb-text strong { display: block; font-size: 16px; margin-bottom: 4px; }
+  .feedback .fb-text strong.c { color: var(--green); }
+  .feedback .fb-text strong.w { color: var(--red); }
+  .feedback .fb-text p { font-size: 14px; color: var(--text-secondary); }
+  .feedback .fb-text .correct-ans { color: var(--text); font-weight: 500; }
+
+  /* Next button */
+  .next-wrap {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 480px;
+    padding: 16px 20px;
+    background: var(--card-bg);
+    border-top: 1px solid var(--border);
+    animation: slideUp 0.3s ease;
+  }
+  @keyframes slideUp {
+    from { transform: translateX(-50%) translateY(100%); opacity: 0; }
+    to { transform: translateX(-50%) translateY(0); opacity: 1; }
+  }
+
+  /* Main menu */
+  .main-menu {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 60px 24px 40px;
+  }
+  .main-menu .hero { text-align: center; }
+  .main-menu .hero .icon { font-size: 64px; margin-bottom: 16px; display: block; animation: bounceIn 0.6s cubic-bezier(0.34,1.56,0.64,1); }
+  @keyframes bounceIn {
+    from { opacity: 0; transform: scale(0.3) rotate(-30deg); }
+    to { opacity: 1; transform: scale(1) rotate(0deg); }
+  }
+  .main-menu h1 { font-size: 28px; font-weight: 700; line-height: 1.2; margin-bottom: 8px; }
+  .main-menu .subtitle { font-size: 15px; color: var(--text-secondary); line-height: 1.5; }
+  .main-menu .actions { display: flex; flex-direction: column; gap: 14px; }
+
+  /* Quiz setup */
+  .quiz-setup {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 0 20px 40px;
+  }
+  .quiz-setup .hero { text-align: center; padding: 40px 0 32px; }
+  .quiz-setup .hero .icon { font-size: 52px; margin-bottom: 12px; display: block; }
+  .quiz-setup h2 { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+  .quiz-setup .bank-count { font-size: 13px; color: var(--text-tertiary); }
+  .quiz-setup .label { font-size: 15px; color: var(--text-secondary); text-align: center; margin-bottom: 14px; }
+  .quiz-setup .q-choices { display: flex; flex-direction: column; gap: 12px; }
+
+  /* Flashcard topics */
+  .topic-list { flex: 1; overflow-y: auto; padding: 16px 20px 32px; display: flex; flex-direction: column; gap: 10px; }
+  .topic-item {
+    display: flex;
+    align-items: center;
+    padding: 14px 16px;
+    border-radius: var(--radius-sm);
+    background: rgba(0,122,255,0.06);
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+    gap: 12px;
+    transition: opacity 0.15s, transform 0.15s;
+    animation: fadeIn 0.3s ease both;
+  }
+  .topic-item:active { opacity: 0.7; transform: scale(0.98); }
+  .topic-item .tid { font-size: 13px; font-weight: 700; color: var(--blue); }
+  .topic-item .ttitle { flex: 1; font-size: 15px; font-weight: 600; color: var(--text); }
+  .topic-item .tcount { font-size: 13px; color: var(--text-secondary); }
+  .topic-item .tchev { font-size: 13px; color: var(--text-tertiary); }
+
+  /* Flashcard view */
+  .fc-header { padding: 12px 20px 8px; }
+  .fc-meta { display: flex; justify-content: space-between; align-items: center; }
+  .fc-meta .fc-counter { font-size: 14px; color: var(--text-secondary); }
+  .fc-topic-title { text-align: center; font-size: 16px; font-weight: 600; padding: 8px 20px 0; }
+
+  .card-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 16px 20px 0;
+  }
+  .flip-hint {
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-tertiary);
+    padding: 8px 0 16px;
+  }
+
+  .flashcard {
+    flex: 1;
+    perspective: 1000px;
+    cursor: pointer;
+    min-height: 280px;
+    max-height: 380px;
+    position: relative;
+  }
+  .flashcard-inner {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+    transition: transform 0.45s cubic-bezier(0.34,1.2,0.64,1);
+  }
+  .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+  .card-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    background: var(--card-bg);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    overflow: hidden;
+  }
+  .card-face.back { transform: rotateY(180deg); }
+  .card-face .card-label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+  .card-face.front { border: 1.5px solid rgba(0,122,255,0.2); }
+  .card-face.front .card-label { color: rgba(0,122,255,0.6); }
+  .card-face.back { border: 1.5px solid rgba(52,199,89,0.2); }
+  .card-face.back .card-label { color: rgba(52,199,89,0.6); }
+  .card-text {
+    flex: 1;
+    font-size: 17px;
+    line-height: 1.5;
+    overflow-y: auto;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .card-text.bullet { text-align: left; }
+  .card-text p { white-space: pre-wrap; }
+
+  .fc-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 48px 32px;
+  }
+  .fc-nav button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 44px;
+    color: var(--blue);
+    line-height: 1;
+    padding: 4px;
+    transition: opacity 0.2s;
+  }
+  .fc-nav button:disabled { color: var(--text-tertiary); cursor: default; }
+
+  /* Results */
+  .results-body { flex: 1; overflow-y: auto; padding: 20px 20px 40px; }
+  .results-hero { text-align: center; padding-bottom: 24px; }
+  .results-hero .result-icon { font-size: 48px; margin-bottom: 12px; animation: popIn 0.5s ease; }
+  .results-hero .grade { font-size: 30px; font-weight: 700; margin-bottom: 8px; }
+  .results-hero .pct {
+    font-size: 72px;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 8px;
+    animation: countUp 0.8s ease;
+  }
+  @keyframes countUp {
+    from { opacity: 0; transform: scale(0.5); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  .results-hero .score-text { font-size: 17px; color: var(--text-secondary); }
+
+  .try-again-wrap { padding: 0 0 24px; }
+
+  .breakdown-title { font-size: 17px; font-weight: 600; margin-bottom: 12px; }
+  .result-rows { display: flex; flex-direction: column; gap: 8px; }
+  .result-row {
+    padding: 12px 16px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+  }
+  .result-row.rr-correct { background: rgba(52,199,89,0.06); }
+  .result-row.rr-wrong { background: rgba(255,59,48,0.06); }
+  .result-row .rr-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .result-row .rr-icon { font-size: 20px; min-width: 22px; }
+  .result-row .rr-num { font-size: 14px; font-weight: 600; color: var(--text-secondary); min-width: 28px; }
+  .result-row .rr-q { flex: 1; font-size: 14px; line-height: 1.4; }
+  .result-row .rr-chevron { font-size: 12px; color: var(--text-tertiary); transition: transform 0.25s; padding-top: 2px; }
+  .result-row.expanded .rr-chevron { transform: rotate(180deg); }
+  .rr-detail { display: none; margin-top: 10px; padding-left: 60px; }
+  .result-row.expanded .rr-detail { display: block; }
+  .rr-detail .det-row { display: flex; gap: 8px; margin-bottom: 4px; font-size: 13px; }
+  .rr-detail .det-label { color: var(--text-secondary); min-width: 90px; }
+  .rr-detail .det-wrong { color: var(--red); }
+  .rr-detail .det-correct { color: var(--green); font-weight: 500; }
+
+  /* Flashcard topics screen header */
+  .fc-topics-header { padding: 16px 20px 0; }
+  .fc-topics-header h2 { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+  .fc-topics-header p { font-size: 15px; color: var(--text-secondary); }
+
+  /* Utility */
+  .spacer { flex: 1; }
+  .color-green { color: var(--green); }
+  .color-orange { color: var(--orange); }
+  .color-red { color: var(--red); }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ===== MAIN MENU ===== -->
+  <div id="screen-menu" class="screen active">
+    <div class="main-menu">
+      <div class="hero">
+        <span class="icon">📐</span>
+        <h1>Design &amp; Technology:<br>Product Design</h1>
+        <p class="subtitle">Study and test your knowledge of the<br>core Product Design content</p>
+      </div>
+      <div class="actions">
+        <button class="menu-btn menu-btn-blue" onclick="showScreen('flashcard-topics')">
+          <span class="icon">🗂️</span>
+          <span class="label">
+            <strong>Flashcards</strong>
+            <span>Browse all topics</span>
+          </span>
+          <span class="chevron">›</span>
+        </button>
+        <button class="menu-btn menu-btn-orange" onclick="showScreen('quiz-setup')">
+          <span class="icon">❓</span>
+          <span class="label">
+            <strong>Quiz</strong>
+            <span>Test your knowledge</span>
+          </span>
+          <span class="chevron">›</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== QUIZ SETUP ===== -->
+  <div id="screen-quiz-setup" class="screen">
+    <div class="header">
+      <button class="back-btn" onclick="showScreen('menu')">
+        <svg viewBox="0 0 10 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="8,1 2,8 8,15"/></svg>
+        Back
+      </button>
+    </div>
+    <div class="quiz-setup">
+      <div class="hero">
+        <span class="icon">❓</span>
+        <h2>Quiz</h2>
+        <p class="bank-count" id="bank-count"></p>
+      </div>
+      <p class="label">Choose number of questions</p>
+      <div class="q-choices">
+        <button class="btn btn-orange" onclick="startQuiz(5)">5 Questions</button>
+        <button class="btn btn-orange" onclick="startQuiz(10)">10 Questions</button>
+        <button class="btn btn-orange" onclick="startQuiz(15)">15 Questions</button>
+        <button class="btn btn-orange" onclick="startQuiz(20)">20 Questions</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== QUIZ ===== -->
+  <div id="screen-quiz" class="screen">
+    <div class="quiz-header">
+      <div class="quiz-meta">
+        <span id="q-progress">Question 1 of 10</span>
+        <span class="score" id="q-score">Score: 0/0</span>
+        <button class="menu-link-btn" onclick="mainMenu()">Main Menu</button>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="q-progress-bar" style="width:0%"></div></div>
+    </div>
+    <div class="quiz-body" id="quiz-body"></div>
+    <div class="next-wrap" id="next-wrap" style="display:none">
+      <button class="btn btn-blue" id="next-btn" onclick="nextQuestion()">Next Question</button>
+    </div>
+  </div>
+
+  <!-- ===== RESULTS ===== -->
+  <div id="screen-results" class="screen">
+    <div class="results-body">
+      <div class="results-hero">
+        <div class="result-icon" id="res-icon"></div>
+        <div class="grade" id="res-grade"></div>
+        <div class="pct" id="res-pct"></div>
+        <div class="score-text" id="res-score-text"></div>
+      </div>
+      <div class="try-again-wrap">
+        <button class="btn btn-blue" onclick="showScreen('quiz-setup')">↩ Try Again</button>
+      </div>
+      <div class="breakdown-title">Question Breakdown</div>
+      <div class="result-rows" id="result-rows"></div>
+    </div>
+  </div>
+
+  <!-- ===== FLASHCARD TOPICS ===== -->
+  <div id="screen-flashcard-topics" class="screen">
+    <div class="header">
+      <button class="back-btn" onclick="showScreen('menu')">
+        <svg viewBox="0 0 10 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="8,1 2,8 8,15"/></svg>
+        Back
+      </button>
+    </div>
+    <div class="fc-topics-header">
+      <h2>Flashcards</h2>
+      <p>Choose a topic</p>
+    </div>
+    <div class="topic-list" id="topic-list"></div>
+  </div>
+
+  <!-- ===== FLASHCARD VIEW ===== -->
+  <div id="screen-flashcard-view" class="screen">
+    <div class="fc-header">
+      <div class="fc-meta">
+        <button class="back-btn" onclick="showScreen('flashcard-topics')">
+          <svg viewBox="0 0 10 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="8,1 2,8 8,15"/></svg>
+          Topics
+        </button>
+        <span class="fc-counter" id="fc-counter">1 / 10</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="fc-progress-bar" style="width:10%"></div></div>
+    </div>
+    <div class="fc-topic-title" id="fc-topic-title"></div>
+    <div class="card-wrap">
+      <div class="flashcard" id="flashcard" onclick="flipCard()">
+        <div class="flashcard-inner">
+          <div class="card-face front">
+            <div class="card-label">QUESTION</div>
+            <div class="card-text" id="fc-question"></div>
+          </div>
+          <div class="card-face back">
+            <div class="card-label">ANSWER</div>
+            <div class="card-text" id="fc-answer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="flip-hint">Tap card to flip</div>
+    </div>
+    <div class="fc-nav">
+      <button id="fc-prev" onclick="fcNavigate(-1)">←</button>
+      <button id="fc-next" onclick="fcNavigate(1)">→</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════
+
+const quizQuestions = [
+  // 1.1 Design Process & Research
+  { question: "What is a 'design need'?", correctAnswer: "A problem or opportunity that requires a design solution.", wrongAnswers: ["A completed product ready for sale to consumers.", "A drawing showing the final appearance of a product.", "A list of tools needed to manufacture a product."] },
+  { question: "Who is the 'client' in the design process?", correctAnswer: "The person or company who commissions the design work.", wrongAnswers: ["The person who will eventually use the finished product.", "The manufacturer responsible for producing the product.", "The retailer who sells the product in shops."] },
+  { question: "Who is the 'end user' of a product?", correctAnswer: "The person who will ultimately use the finished product.", wrongAnswers: ["The person who pays the designer to create the product.", "The factory worker who assembles the product components.", "The inspector who tests the product for safety compliance."] },
+  { question: "What is a 'target market'?", correctAnswer: "The specific group of people a product is designed for.", wrongAnswers: ["The retail price set for a product at launch.", "The factory where the product will be manufactured.", "The country where the product is sold first."] },
+  { question: "What is a design brief?", correctAnswer: "A short document outlining the design problem and requirements.", wrongAnswers: ["A detailed manufacturing plan with step-by-step instructions.", "A scale drawing showing exact dimensions of the product.", "A final evaluation report written after product testing."] },
+  { question: "What is a design specification?", correctAnswer: "A detailed list of criteria the final product must meet.", wrongAnswers: ["A rough sketch of initial design ideas and concepts.", "A short paragraph describing the design problem only.", "A photograph of an existing product for reference."] },
+  { question: "What does ACCESSFM stand for in specifications?", correctAnswer: "Aesthetics, Cost, Customer, Environment, Size, Safety, Function, Materials.", wrongAnswers: ["Analysis, Construction, Cutting, Energy, Strength, Shape, Finish, Manufacture.", "Appearance, Colour, Components, Ergonomics, Scale, Sustainability, Form, Making.", "Assembly, CAD, CAM, Evaluation, Sketching, Specification, Feedback, Modelling."] },
+  { question: "What is primary research?", correctAnswer: "Original data collected first-hand by the designer themselves.", wrongAnswers: ["Information gathered from books, websites, or existing sources.", "The first draft of a design specification document.", "Testing done on the final manufactured product."] },
+  { question: "What is secondary research?", correctAnswer: "Information gathered from existing sources like books or websites.", wrongAnswers: ["Original surveys and interviews conducted by the designer.", "The second round of prototype testing with users.", "Research done after the product has been manufactured."] },
+  { question: "What is quantitative data?", correctAnswer: "Numerical data that can be measured and analysed statistically.", wrongAnswers: ["Descriptive data based on opinions and personal feelings.", "Photographs and sketches collected during research.", "Information about material costs from a single supplier."] },
+  { question: "What is qualitative data?", correctAnswer: "Descriptive data based on opinions, feelings, and observations.", wrongAnswers: ["Numerical data collected through measurements and counting.", "Data shown only in pie charts and bar graphs.", "Manufacturing tolerances recorded during quality control."] },
+  { question: "What is anthropometrics?", correctAnswer: "The study of human body measurements for design purposes.", wrongAnswers: ["The study of how products impact the natural environment.", "The study of colour theory and visual aesthetics.", "The study of material strength under different forces."] },
+  { question: "What does sustainability mean in design?", correctAnswer: "Meeting present needs without compromising future generations' resources.", wrongAnswers: ["Making products as cheaply as possible for consumers.", "Using only plastic materials in product manufacturing.", "Designing products that last exactly one year before replacement."] },
+  { question: "What is a product life cycle?", correctAnswer: "The stages a product goes through from creation to disposal.", wrongAnswers: ["The time it takes to manufacture one unit in a factory.", "The warranty period offered by the manufacturer.", "The distance a product travels from factory to shop."] },
+
+  // 1.2 Design Ideas & Communication
+  { question: "What is a moodboard?", correctAnswer: "A visual collection of images and materials to inspire design ideas.", wrongAnswers: ["A detailed technical drawing with exact measurements.", "A written list of materials needed for manufacturing.", "A flowchart showing the order of manufacturing steps."] },
+  { question: "What does SCAMPER stand for in design?", correctAnswer: "Substitute, Combine, Adapt, Modify, Put to other use, Eliminate, Reverse.", wrongAnswers: ["Sketch, Cut, Assemble, Measure, Paint, Evaluate, Repeat.", "Safety, Cost, Aesthetics, Materials, Production, Environment, Recycling.", "Scale, Colour, Align, Mark, Print, Edit, Render."] },
+  { question: "What is rendering in design communication?", correctAnswer: "Adding colour, tone, and texture to drawings for a realistic look.", wrongAnswers: ["Creating a 3D physical model from card or foam.", "Writing detailed notes alongside technical drawings.", "Cutting materials to the exact dimensions specified."] },
+  { question: "What is an orthographic projection?", correctAnswer: "A 2D technical drawing showing front, side, and plan views.", wrongAnswers: ["A 3D sketch drawn at a 30-degree angle to show depth.", "A photograph of the finished product from one angle.", "A freehand sketch showing the product in perspective."] },
+  { question: "What is an isometric drawing?", correctAnswer: "A 3D drawing using 30-degree angles with no vanishing points.", wrongAnswers: ["A flat 2D drawing showing only the front view.", "A drawing that uses one or two vanishing points for realism.", "A cross-section drawing showing internal details of a product."] },
+  { question: "What is perspective drawing?", correctAnswer: "A realistic 3D drawing using vanishing points on a horizon line.", wrongAnswers: ["A technical drawing with exact measurements and dimensions.", "A drawing using 30-degree angles without vanishing points.", "A flat pattern layout for sheet material construction."] },
+  { question: "What is the purpose of modelling in design?", correctAnswer: "To test and develop ideas in three dimensions before manufacturing.", wrongAnswers: ["To create the final product for sale to customers.", "To produce technical drawings for the manufacturer.", "To calculate the exact cost of materials needed."] },
+  { question: "What is CAD?", correctAnswer: "Computer-Aided Design, using software to create precise digital drawings.", wrongAnswers: ["Computer-Aided Distribution, tracking products to retail stores.", "A hand-drawn sketch technique using coloured pencils.", "A quality control method for checking manufactured products."] },
+  { question: "What is a mock-up?", correctAnswer: "A full-size model made from cheap materials to test a design.", wrongAnswers: ["The final manufactured product ready for sale.", "A computer simulation of how the product will work.", "A written description of the product's key features."] },
+  { question: "What is attribute analysis?", correctAnswer: "A method comparing features of existing products in a table format.", wrongAnswers: ["Testing material samples to find their breaking point.", "A sketch technique using shading to show form.", "A safety check performed before using workshop equipment."] },
+  { question: "What is a SWOT analysis?", correctAnswer: "A tool examining Strengths, Weaknesses, Opportunities, and Threats.", wrongAnswers: ["A method for testing material hardness and durability.", "A safety checklist used before operating machinery.", "A technique for rendering drawings with colour markers."] },
+  { question: "What is an exploded view drawing?", correctAnswer: "A drawing showing parts separated along an axis to reveal assembly.", wrongAnswers: ["A cross-section drawing cut through the middle of a product.", "A drawing showing a product after destructive testing.", "A close-up drawing of one small detail of a product."] },
+  { question: "What are working drawings used for?", correctAnswer: "To provide all information needed to manufacture the product accurately.", wrongAnswers: ["To show initial rough ideas at the start of designing.", "To advertise the product in marketing brochures.", "To record the results of user testing and feedback."] },
+
+  // 1.3 Materials & Manufacturing
+  { question: "Why do designers test materials?", correctAnswer: "To check if materials are suitable for the product's intended purpose.", wrongAnswers: ["To make the materials look more attractive to buyers.", "To increase the weight of the final product.", "To reduce the number of colours available for finishing."] },
+  { question: "What is a cutting list?", correctAnswer: "A detailed list of all parts with their exact sizes and materials.", wrongAnswers: ["A list of cutting tools available in the workshop.", "Instructions on how to safely use a saw.", "A record of waste material produced during manufacture."] },
+  { question: "What is a flowchart used for in manufacturing?", correctAnswer: "To show the sequence of steps in a manufacturing process visually.", wrongAnswers: ["To display the flow of electricity through a circuit.", "To measure the flow rate of liquids in a product.", "To record how air flows through a ventilation system."] },
+  { question: "What is marking out?", correctAnswer: "Transferring measurements and shapes onto materials before cutting.", wrongAnswers: ["Grading student design work with marks out of ten.", "Applying a surface finish to a completed product.", "Writing labels on packaging for retail display."] },
+  { question: "What is a datum in manufacturing?", correctAnswer: "A fixed reference point or line from which measurements are taken.", wrongAnswers: ["A type of adhesive used for joining wood pieces.", "The brand name stamped on a finished product.", "A safety guard fitted to workshop machinery."] },
+  { question: "What is vacuum forming?", correctAnswer: "Heating a plastic sheet and using suction to shape it over a mould.", wrongAnswers: ["Injecting molten plastic into a metal mould under pressure.", "Bending a plastic sheet along a straight heated line.", "Cutting shapes from plastic using a laser cutter."] },
+  { question: "What is line bending?", correctAnswer: "Heating a narrow strip of thermoplastic along a line then folding it.", wrongAnswers: ["Bending metal rods around a former using a vice.", "Drawing straight lines on material using a ruler.", "Heating an entire plastic sheet and draping it over a mould."] },
+  { question: "What is injection moulding?", correctAnswer: "Forcing molten plastic into a mould cavity under high pressure.", wrongAnswers: ["Pouring liquid resin into an open mould and letting it set.", "Heating plastic sheet and pulling it over a mould with vacuum.", "Carving a shape from a solid block of plastic material."] },
+  { question: "What are standard components?", correctAnswer: "Pre-manufactured parts made in standard sizes, like screws and bolts.", wrongAnswers: ["Custom parts made uniquely for one specific product.", "Components that have failed quality control checks.", "Parts that are only used in one-off production."] },
+  { question: "What are KD (knock-down) fittings?", correctAnswer: "Fittings that allow furniture to be assembled and disassembled easily.", wrongAnswers: ["Permanent joints that cannot be taken apart once assembled.", "Safety equipment worn when knocking down old structures.", "Decorative fittings added to improve product appearance."] },
+  { question: "What are tolerances in manufacturing?", correctAnswer: "The acceptable range of variation in a measurement or dimension.", wrongAnswers: ["The maximum weight a product can safely support.", "The number of products made in a single batch.", "The temperature at which a material begins to melt."] },
+  { question: "What is a manufacturing plan?", correctAnswer: "A step-by-step guide detailing how to make a product.", wrongAnswers: ["A marketing strategy for selling the finished product.", "A floor plan showing the layout of a retail shop.", "A financial budget for the entire design project."] },
+  { question: "Why are adhesives used in manufacturing?", correctAnswer: "To permanently join materials together using chemical bonding.", wrongAnswers: ["To temporarily hold parts while taking photographs.", "To add colour and pattern to a product surface.", "To protect materials from rust and corrosion only."] },
+  { question: "Why is surface finishing applied to products?", correctAnswer: "To protect surfaces and improve the product's visual appearance.", wrongAnswers: ["To make the product heavier and more stable.", "To hide the product's internal mechanism from view.", "To make the product easier to disassemble for recycling."] },
+
+  // 1.4 Evaluation
+  { question: "What is formative evaluation?", correctAnswer: "Ongoing evaluation carried out during the design and making process.", wrongAnswers: ["A final evaluation done only after the product is complete.", "An evaluation performed exclusively by the client.", "Testing a product to destruction to find its limits."] },
+  { question: "What is summative evaluation?", correctAnswer: "A final evaluation of the completed product against the specification.", wrongAnswers: ["Evaluation done at the very start before any designing begins.", "Ongoing checks made during the manufacturing process.", "A sum of all material costs for the project."] },
+  { question: "What is product disassembly in evaluation?", correctAnswer: "Taking apart an existing product to understand how it is made.", wrongAnswers: ["Destroying a product to test its strength under force.", "Removing a product from sale due to safety concerns.", "Recycling a product at the end of its useful life."] },
+  { question: "What is a user trial?", correctAnswer: "Testing a product with real users to gather feedback on performance.", wrongAnswers: ["A legal trial when a product causes injury to someone.", "The first time a product is displayed in a retail store.", "A competition between designers to win a contract."] },
+  { question: "How are questionnaires useful in evaluation?", correctAnswer: "They collect structured feedback from users about the product.", wrongAnswers: ["They calculate the exact manufacturing cost of a product.", "They provide technical drawings for the manufacturer.", "They test the physical strength of materials used."] },
+  { question: "What is peer review in design evaluation?", correctAnswer: "Getting feedback on your work from other students or designers.", wrongAnswers: ["Reviewing health and safety rules before using equipment.", "Checking a product's price against competitors in shops.", "Inspecting raw materials before they enter the factory."] },
+  { question: "What is Kaizen (continual improvement)?", correctAnswer: "A philosophy of making small, ongoing improvements to products or processes.", wrongAnswers: ["A Japanese style of decorative surface finishing.", "A one-time major redesign of an entire product range.", "A method of mass producing identical items very quickly."] },
+  { question: "What is commercial testing?", correctAnswer: "Testing products to ensure they meet legal standards before sale.", wrongAnswers: ["Advertising a product on television and social media.", "Selling a product at a discounted price to test demand.", "Designing packaging to attract customers in a shop."] },
+
+  // 1.5 Health & Safety
+  { question: "What is a risk assessment?", correctAnswer: "Identifying hazards and evaluating the likelihood and severity of harm.", wrongAnswers: ["A financial report on the cost of product insurance.", "A marketing survey to assess customer preferences.", "A test to measure material strength under stress."] },
+  { question: "What is PPE?", correctAnswer: "Personal Protective Equipment worn to reduce risk of injury.", wrongAnswers: ["Post-Production Evaluation, a final product check.", "Primary Production Equipment used in factories.", "Pre-Planning Exercise done before starting a design project."] },
+  { question: "What does COSHH stand for?", correctAnswer: "Control of Substances Hazardous to Health.", wrongAnswers: ["Certification of Safety and Health in Homes.", "Committee on Standards for Household Hardware.", "Centre for Occupational Safety and Hazard Handling."] },
+  { question: "What does CE marking on a product indicate?", correctAnswer: "The product meets EU health, safety, and environmental standards.", wrongAnswers: ["The product was designed using computer-aided design software.", "The product is made entirely from recycled materials.", "The product has won a design award for innovation."] },
+  { question: "What is the BSI?", correctAnswer: "British Standards Institution, setting quality and safety standards for products.", wrongAnswers: ["Bureau of Sustainable Industry, promoting green manufacturing.", "Board of Scientific Innovation, funding new product research.", "British Sales Index, tracking product sales across the UK."] },
+  { question: "What does off-shoring mean in manufacturing?", correctAnswer: "Moving production to another country, usually to reduce costs.", wrongAnswers: ["Manufacturing products on floating factory ships at sea.", "Selling products exclusively in overseas markets.", "Designing products specifically for coastal environments."] },
+  { question: "What does out-sourcing mean?", correctAnswer: "Hiring an external company to carry out part of the work.", wrongAnswers: ["Using only materials sourced from outside the country.", "Selling excess stock to other companies at a discount.", "Designing products for outdoor use and environments."] },
+  { question: "What safety responsibilities do designers have?", correctAnswer: "Designers must ensure their products are safe for users.", wrongAnswers: ["Designers are only responsible for making products look attractive.", "Designers must personally manufacture every product they design.", "Designers are only responsible for keeping material costs low."] },
+
+  // 1.6 CAD/CAM & Production Systems
+  { question: "What is CAM?", correctAnswer: "Computer-Aided Manufacture, using computers to control production machinery.", wrongAnswers: ["Computer-Aided Marketing, promoting products using software.", "A hand-operated cutting tool used for shaping wood.", "A quality control system for inspecting finished products."] },
+  { question: "What is CIM?", correctAnswer: "Computer Integrated Manufacturing, linking CAD, CAM, and business systems together.", wrongAnswers: ["A type of adhesive used to join metal components.", "A manual method of assembling products by hand.", "A design technique using only pencil and paper."] },
+  { question: "What does a vinyl cutter do?", correctAnswer: "Cuts shapes from thin vinyl sheet using a computer-controlled blade.", wrongAnswers: ["Prints full-colour images directly onto vinyl surfaces.", "Melts and moulds vinyl into three-dimensional shapes.", "Welds vinyl sheets together using heat and pressure."] },
+  { question: "What does a laser cutter do?", correctAnswer: "Uses a focused laser beam to cut or engrave materials precisely.", wrongAnswers: ["Uses a spinning blade to cut thick metal sheets.", "Joins materials together using a beam of focused light.", "Measures distances using a laser for marking out."] },
+  { question: "How does a 3D printer work?", correctAnswer: "It builds objects layer by layer from a digital CAD file.", wrongAnswers: ["It cuts 3D shapes from solid blocks of material.", "It prints flat images that fold into 3D shapes.", "It scans existing objects and creates paper drawings."] },
+  { question: "What is a CNC router?", correctAnswer: "A computer-controlled machine that cuts and shapes materials automatically.", wrongAnswers: ["A handheld tool used to smooth wood surfaces by hand.", "A device that connects computers to the internet wirelessly.", "A manual measuring instrument used for marking out."] },
+  { question: "What is rapid prototyping?", correctAnswer: "Quickly producing a physical model from a digital design, often using 3D printing.", wrongAnswers: ["Sketching design ideas very quickly in a brainstorming session.", "Mass producing thousands of identical products very fast.", "Writing a design specification in under one hour."] },
+  { question: "What is one-off production?", correctAnswer: "Making a single, unique product to meet a specific requirement.", wrongAnswers: ["Producing thousands of identical items on an assembly line.", "Making a set number of identical products in a group.", "Running a factory continuously without ever stopping production."] },
+  { question: "What is batch production?", correctAnswer: "Making a set quantity of identical products in a group.", wrongAnswers: ["Making a single unique item for one specific customer.", "Producing items continuously without stopping the production line.", "Making millions of the same product on automated assembly lines."] },
+  { question: "What is mass production?", correctAnswer: "Manufacturing large quantities of identical products using assembly lines.", wrongAnswers: ["Making one unique product by hand for a single client.", "Producing a small batch of 20 customised items.", "A production method where machines run without any human workers."] },
+  { question: "What is continuous production?", correctAnswer: "A production method running 24/7 without stopping, for high-demand products.", wrongAnswers: ["Production that only runs during normal daytime working hours.", "Making one product at a time by hand in a workshop.", "A batch of products made once and never repeated."] },
+  { question: "What is quality control?", correctAnswer: "Checking products at stages during manufacture to ensure they meet standards.", wrongAnswers: ["Designing products to look as expensive as possible.", "Counting the total number of products made each day.", "Marketing products to the highest quality customer segment."] },
+  { question: "What is a closed-loop system?", correctAnswer: "A system with feedback that automatically adjusts its output.", wrongAnswers: ["A system with no feedback that runs without any adjustment.", "A factory that does not allow visitors inside.", "A recycling system where no waste leaves the building."] },
+  { question: "What is an open-loop system?", correctAnswer: "A system with no feedback that does not self-correct its output.", wrongAnswers: ["A system that monitors output and adjusts automatically.", "A factory with doors open for public tours.", "A production line that accepts any raw material input."] },
+  { question: "What is FMS (Flexible Manufacturing System)?", correctAnswer: "A computer-controlled system that can quickly switch between different products.", wrongAnswers: ["A manual system where workers bend flexible materials by hand.", "A design method using flexible card to make models.", "A marketing strategy that adapts to customer complaints."] },
+  { question: "What is RFID used for?", correctAnswer: "Radio Frequency Identification, tracking products using radio wave tags.", wrongAnswers: ["A type of surface finish applied to metal products.", "A computer-aided design software for 3D modelling.", "A safety standard for electrical products in the EU."] },
+
+  // 1.7 Design Roles & Human Factors
+  { question: "What does a product designer do?", correctAnswer: "Develops the form, function, and manufacture of new products.", wrongAnswers: ["Only creates marketing campaigns for existing products.", "Exclusively operates factory machinery during production.", "Solely writes instruction manuals for finished products."] },
+  { question: "What is the role of an artisan?", correctAnswer: "A skilled craftsperson who makes products by hand, often one-off items.", wrongAnswers: ["A factory manager who oversees mass production lines.", "A computer programmer who writes CAD software.", "A salesperson who markets products to retail stores."] },
+  { question: "What is a design technologist?", correctAnswer: "Someone who focuses on the technical and manufacturing aspects of design.", wrongAnswers: ["A person who only sketches creative ideas freehand.", "A customer who provides feedback on product designs.", "An artist who paints decorative patterns on products."] },
+  { question: "What is Life Cycle Analysis (LCA)?", correctAnswer: "Assessing the environmental impact of a product through all its stages.", wrongAnswers: ["Predicting how long a product will last before breaking.", "Calculating the profit made during a product's sales period.", "Testing how many times a mechanical part can cycle."] },
+  { question: "What does 'cradle to cradle' mean in design?", correctAnswer: "Designing products so all materials can be reused or recycled endlessly.", wrongAnswers: ["Designing baby products from birth to toddler stage.", "The journey of a product from factory to retail store.", "Making products from only brand-new raw materials."] },
+  { question: "What is ergonomics?", correctAnswer: "Designing products to fit the user for comfort and efficiency.", wrongAnswers: ["The study of how products affect the global economy.", "A method of testing material strength in a laboratory.", "The science of choosing colours for product packaging."] },
+  { question: "What is planned obsolescence?", correctAnswer: "Deliberately designing a product to have a limited useful lifespan.", wrongAnswers: ["Carefully planning a product to last as long as possible.", "Designing backup systems so products never stop working.", "A manufacturing fault causing products to fail unexpectedly."] },
+  { question: "What is inclusive design?", correctAnswer: "Designing products that can be used by the widest range of people.", wrongAnswers: ["Designing products exclusively for able-bodied young adults.", "Including as many extra features as possible in a product.", "A pricing strategy that includes tax in the displayed price."] },
+  { question: "Why are social considerations important in design?", correctAnswer: "Products affect people's lives, culture, and communities.", wrongAnswers: ["Social media is the only way to market new products.", "Designers must attend social events to find new clients.", "Products should only be designed for social media influencers."] },
+  { question: "Why are environmental considerations important in design?", correctAnswer: "Products impact the environment through materials, energy, and waste.", wrongAnswers: ["Products should only be used in outdoor environments.", "Environmental concerns only matter for garden products.", "Designers must work in environmentally controlled offices."] },
+
+  // 1.8 Design Movements & Aesthetics
+  { question: "What is biomimicry in design?", correctAnswer: "Designing products inspired by forms and systems found in nature.", wrongAnswers: ["Using only biological materials like wood and cotton.", "Designing products that look like human body parts.", "A technique for growing products using living organisms."] },
+  { question: "What does 'form follows function' mean?", correctAnswer: "A product's shape should be determined by its intended purpose.", wrongAnswers: ["Products must always be shaped like geometric forms.", "The form used to order a product follows its function.", "Appearance is always more important than how a product works."] },
+  { question: "What is the primary function of a product?", correctAnswer: "The main purpose for which the product was designed.", wrongAnswers: ["The decorative appearance that attracts buyers in shops.", "The first function tested during quality control checks.", "The function that costs the most money to achieve."] },
+  { question: "What is a secondary function of a product?", correctAnswer: "An additional purpose beyond the product's main intended use.", wrongAnswers: ["A function that only works the second time you use it.", "The backup function used when the primary function fails.", "A function only available in the second version of a product."] },
+  { question: "What characterised the Arts and Crafts movement?", correctAnswer: "Handcrafted quality, natural materials, and rejection of mass production.", wrongAnswers: ["Bright plastic colours, mass production, and futuristic shapes.", "Geometric patterns, chrome metals, and machine-made precision.", "Irregular blob shapes, digital design, and synthetic materials."] },
+  { question: "What characterised Art Nouveau?", correctAnswer: "Flowing organic lines, natural forms, and decorative curved shapes.", wrongAnswers: ["Straight geometric lines, bold primary colours, and simple forms.", "Industrial materials, minimal decoration, and functional simplicity.", "Random asymmetric shapes, neon colours, and digital patterns."] },
+  { question: "What characterised the Art Deco movement?", correctAnswer: "Bold geometric shapes, lavish decoration, and luxurious materials.", wrongAnswers: ["Flowing organic curves inspired by plants and nature.", "Plain undecorated surfaces with no colour or pattern.", "Handcrafted items rejecting all machine-made production methods."] },
+  { question: "What was the Bauhaus?", correctAnswer: "A German design school combining art, craft, and technology for functional design.", wrongAnswers: ["A French fashion house specialising in luxury clothing.", "A British museum dedicated to Victorian-era design.", "An Italian car manufacturer known for sports vehicles."] },
+  { question: "What characterises Modernism in design?", correctAnswer: "Clean lines, minimal decoration, functional forms, and modern materials.", wrongAnswers: ["Excessive ornamental decoration and handcrafted natural materials.", "Irregular blob-like shapes with bright clashing colours.", "Copying historical styles exactly without any changes."] },
+  { question: "What characterises Postmodernism in design?", correctAnswer: "Playful, colourful designs that reject strict modernist rules and conventions.", wrongAnswers: ["Plain, functional objects with no colour or decoration.", "Strictly following traditional rules of proportion and balance.", "Using only natural materials with no synthetic components."] },
+  { question: "What is Blobism in design?", correctAnswer: "A style using organic, curved, blob-like forms often created with CAD.", wrongAnswers: ["A movement focused on sharp angular geometric shapes.", "A technique for applying paint in thick blobs on surfaces.", "A design style that only uses flat two-dimensional shapes."] },
+  { question: "What does aesthetics mean in design?", correctAnswer: "How a product looks and appeals to the senses of the user.", wrongAnswers: ["How strong and durable a product is during use.", "How much a product costs to manufacture in a factory.", "How quickly a product can be assembled on a production line."] },
+  { question: "How does colour affect product design?", correctAnswer: "Colour influences mood, brand identity, and user perception of a product.", wrongAnswers: ["Colour only matters for products designed for children.", "Colour has no effect on how users perceive products.", "Colour is added randomly and has no design purpose."] },
+  { question: "How does texture affect product design?", correctAnswer: "Texture influences grip, feel, and the perceived quality of a product.", wrongAnswers: ["Texture is purely decorative and has no functional benefit.", "Texture only matters for products made from wood.", "Smooth texture is always preferred over rough in all products."] },
+
+  // 1.9 Energy & Sustainability
+  { question: "What are fossil fuels?", correctAnswer: "Non-renewable energy sources like coal, oil, and natural gas.", wrongAnswers: ["Renewable energy sources that will never run out.", "Fuels made from recycled plastic waste materials.", "Ancient fossils used as decorative materials in products."] },
+  { question: "What is nuclear energy?", correctAnswer: "Energy released by splitting atoms in a controlled nuclear reaction.", wrongAnswers: ["Energy generated by burning coal in a power station.", "Energy captured from sunlight using photovoltaic panels.", "Energy produced by the movement of wind turbine blades."] },
+  { question: "Name a type of renewable energy.", correctAnswer: "Solar power, which captures energy from sunlight using panels.", wrongAnswers: ["Coal power, which burns fossil fuels in power stations.", "Oil power, which refines petroleum into usable fuel.", "Natural gas, which is extracted from underground reserves."] },
+  { question: "What are the Six R's of sustainability?", correctAnswer: "Reduce, Reuse, Recycle, Refuse, Rethink, and Repair.", wrongAnswers: ["Research, Review, Redesign, Rebuild, Resell, and Return.", "Read, Record, Report, Respond, Resolve, and Reward.", "Risk, Rate, Rank, Regulate, Remove, and Replace."] },
+  { question: "What does recycling involve?", correctAnswer: "Processing used materials into new products to reduce waste.", wrongAnswers: ["Throwing away all used products into general landfill.", "Selling used products to other countries without processing.", "Burning waste materials to generate heat energy only."] },
+  { question: "What is a composite material?", correctAnswer: "A material made by combining two or more different materials together.", wrongAnswers: ["A single pure material like copper or aluminium.", "A material that can only be used once before disposal.", "A natural material extracted directly from the ground."] },
+  { question: "What is designing for disassembly?", correctAnswer: "Making products easy to take apart for repair, reuse, or recycling.", wrongAnswers: ["Designing products that break apart safely when dropped.", "Creating products that can never be taken apart once assembled.", "A method of destroying products at the end of their life."] },
+  { question: "What do plastic recycling symbols indicate?", correctAnswer: "The type of plastic resin used, helping sort plastics for recycling.", wrongAnswers: ["The country where the plastic product was manufactured.", "The year the plastic product was made and its expiry date.", "The weight of plastic used in the product's construction."] },
+  { question: "Why is wind energy considered renewable?", correctAnswer: "Wind is a natural resource that will not run out.", wrongAnswers: ["Wind turbines are made from recycled materials only.", "Wind energy produces large amounts of carbon dioxide.", "Wind power stations can only operate for five years."] },
+  { question: "What is the environmental problem with fossil fuels?", correctAnswer: "Burning them releases greenhouse gases contributing to climate change.", wrongAnswers: ["They are too cheap and widely available everywhere.", "They produce no pollution but are difficult to transport.", "They can only be used during daylight hours."] },
+
+  // Additional Mixed
+  { question: "What does CAFEQUE stand for in research analysis?", correctAnswer: "Cost, Aesthetics, Function, Environment, Quality, Usability, Ergonomics.", wrongAnswers: ["Client, Assembly, Finish, Evaluation, Quantity, Units, Energy.", "Colour, Adhesive, Form, Edge, Quick, Uniform, Exact.", "Cutting, Alignment, Fixing, Engineering, Quota, Usage, Efficiency."] },
+  { question: "What is pass-fail analysis?", correctAnswer: "Testing whether a product meets each specification point with a yes or no.", wrongAnswers: ["A school exam where students pass or fail a design test.", "A destructive test where products are loaded until they fail.", "A system for grading products from A to F for quality."] },
+  { question: "What is a barcode used for on products?", correctAnswer: "Storing product information that can be scanned for identification and pricing.", wrongAnswers: ["Decorating product packaging with black and white stripes.", "Showing the designer's signature on the finished product.", "Indicating the colour options available for the product."] },
+  { question: "What advantage does CAD have over hand drawing?", correctAnswer: "CAD allows easy editing, precision, and sharing of digital designs.", wrongAnswers: ["CAD drawings are always more creative than hand drawings.", "CAD requires no training and anyone can use it immediately.", "CAD software is always free and available on all devices."] },
+  { question: "What is the purpose of a prototype?", correctAnswer: "A working model used to test and evaluate a design before production.", wrongAnswers: ["The final mass-produced version of a product for sale.", "A written document describing how the product should look.", "A marketing tool used only for advertising campaigns."] },
+  { question: "Why is ergonomics important in product design?", correctAnswer: "It ensures products are comfortable, efficient, and safe for users.", wrongAnswers: ["It only applies to office furniture and has no other use.", "It focuses exclusively on making products look attractive.", "It is a legal requirement only for children's toy design."] },
+  { question: "What is the difference between one-off and batch production?", correctAnswer: "One-off makes a single unique item; batch makes a set quantity.", wrongAnswers: ["One-off uses machines; batch production is always done by hand.", "One-off is cheaper than batch because fewer materials are needed.", "There is no difference; both terms mean the same thing."] },
+  { question: "What is an advantage of injection moulding?", correctAnswer: "It can produce large quantities of identical items very quickly.", wrongAnswers: ["It is the cheapest method for making a single prototype.", "It works with all materials including wood and metal.", "It requires no mould and shapes material freehand."] },
+  { question: "What is a thermoplastic?", correctAnswer: "A plastic that can be heated and reshaped multiple times.", wrongAnswers: ["A plastic that permanently hardens and cannot be reshaped.", "A type of thermal insulation material used in buildings.", "A metal alloy that becomes plastic at high temperatures."] },
+  { question: "What is a thermosetting plastic?", correctAnswer: "A plastic that permanently sets when heated and cannot be reshaped.", wrongAnswers: ["A plastic that can be reheated and remoulded many times.", "A plastic used exclusively for making thermal flasks.", "A biodegradable plastic made from natural plant materials."] },
+  { question: "What is the purpose of quality assurance?", correctAnswer: "A system ensuring quality is built into every stage of production.", wrongAnswers: ["Checking only the final product before it leaves the factory.", "A warranty given to customers after they purchase a product.", "A marketing claim about a product being the best available."] },
+  { question: "What is a net or development in design?", correctAnswer: "A flat pattern that folds up to create a 3D shape or package.", wrongAnswers: ["A mesh material used to filter liquids in products.", "The internet connection needed to use CAD software.", "The profit made after subtracting manufacturing costs."] },
+  { question: "Why is user-centred design important?", correctAnswer: "It focuses on the needs and preferences of the end user.", wrongAnswers: ["It allows the designer to ignore the client's requirements.", "It means users must design the product themselves.", "It only considers the centre section of a product layout."] },
+  { question: "What is the purpose of a scale model?", correctAnswer: "A proportionally smaller or larger model to test design ideas.", wrongAnswers: ["A model used only to weigh products on a balance scale.", "A full-size prototype ready for commercial production.", "A drawing tool shaped like a fish scale for patterns."] },
+];
+
+const flashcardTopics = [
+  {
+    id: "1.1", title: "Design Process & Research",
+    cards: [
+      { q: "What is a Design Need?", a: "A design need arises when designers are dissatisfied with existing products and wish to improve them, or when they want to help people or use new technology to make life easier. It is the starting point for creating a new product." },
+      { q: "What is a Client?", a: "A client is usually a company or an entrepreneur who may finance a new product. Designers work with their client to establish a design brief." },
+      { q: "What is an End User?", a: "The end user is the person who will actually use the finished product. Designers must be clear about who they are designing for." },
+      { q: "What is an Outcome?", a: "The outcome is the final project or product that results from the design process." },
+      { q: "Why is having a client important?", a: "A client provides genuine insight and feedback on work and analysis. They help the designer fully understand the issues and constraints involved, and represent the target market or user group." },
+      { q: "What is a Target Market?", a: "The target market is the group of people you hope will use your product. It is important to keep them in mind throughout the design process." },
+      { q: "Give four examples of design themes/problem areas.", a: "• Problems in the home (e.g. organising a desk)\n• Sport and recreation (e.g. equipment storage)\n• Support for specific user groups\n• Safety (e.g. signage and instructions)\n• Pets and animals" },
+      { q: "What is a brainstorm and why is it useful?", a: "A brainstorm is a way of putting down initial thoughts and findings on paper around a central theme. It helps explore aspects such as materials, function, aesthetics, cost, environment, and components — all linked to the design problem." },
+      { q: "What is a Design Brief?", a: "A design brief is a statement of your design intent or a description of what the product will be like. It is the first stage of the design process, written with the client." },
+      { q: "What should a Design Brief include?", a: "• What the problem is\n• Where the problem is\n• The function of the product\n• Who is going to use it\n• How often/when it will be used\n• What type of product to design\n• What materials will be used\n• Health and safety considerations" },
+      { q: "What is the Design Process?", a: "The design process is a logical problem-solving process of designing a product. The design brief is usually the starting point of the design process." },
+      { q: "What is a Specification?", a: "A specification is a detailed document that develops the brief. It lists key points researched about the problem, observations from discussions with the client/users, and initial research. It lists key constraints and is the basis for designs." },
+      { q: "What does the acronym CAFEQUE stand for?", a: "C - Cost\nA - Appearance\nF - Function\nE - Ergonomics\nQ - Quality\nU - User\nE - Environment" },
+      { q: "What does the acronym ACCESSFM stand for?", a: "A - Aesthetics\nC - Customer\nC - Cost\nE - Ergonomics\nS - Size\nS - Safety\nF - Function\nM - Manufacture\n\nA useful checklist for writing a specification." },
+      { q: "What is a Constraint in design?", a: "A constraint is something that may limit aspects of your design, such as budget, available materials, manufacturing methods, or size requirements." },
+      { q: "What is Sustainability in the context of design?", a: "Sustainability is the ability of materials to be used wisely with little or no negative impact on the environment." },
+      { q: "What is a Life Cycle of a product?", a: "The life cycle covers all the stages of a product's existence — from its design and creation, through its use, to the end of its 'life'." },
+      { q: "What is Primary Research?", a: "Primary research is new research that you carry out yourself. Examples include: looking at existing products, observing users, measuring dimensions, finding available materials, and deciding on finishes." },
+      { q: "What is Secondary Research?", a: "Secondary research is research based on other people's work. Sources include: designers' work, magazines, data books, the internet, and anthropometric data." },
+      { q: "What is Quantitative Data?", a: "Quantitative data is information that can be easily expressed and analysed in a numerical form (e.g. measurements, survey percentages)." },
+      { q: "What is Qualitative Data?", a: "Qualitative data is information in the form of opinions (e.g. user preferences, feelings about a product's aesthetics)." },
+      { q: "What are Surveys?", a: "Surveys are a set of questions asked to the public or user groups in order to gather specific information to help develop products and services. They can be done online, by telephone, in person, or by post." },
+      { q: "What is Anthropometrics Data?", a: "Anthropometrics data is information about the measurements and properties of the human body (e.g. hand sizes of 15-year-olds, seating height). It is essential for ergonomic design." },
+      { q: "What is Primary Research?", a: "Primary research is new research that you carry out yourself. Examples include: looking at existing products, observing users, measuring dimensions, finding available materials, and deciding on finishes." },
+      { q: "Why do designers analyse existing products?", a: "Designers analyse existing products to ask 'Can I improve the design in any way?' and to gather inspiration. They investigate materials, manufacture, function, ergonomics, cost, aesthetics, target market, and environmental concerns." },
+    ]
+  },
+  {
+    id: "1.2", title: "Design Ideas & Communication",
+    cards: [
+      { q: "What is the purpose of generating design ideas?", a: "To produce a wide range of imaginative preliminary ideas for what a solution may look like and how it works. It allows the designer to demonstrate creativity in solving problems. All ideas must be recorded so progress can be reviewed." },
+      { q: "What is a Moodboard?", a: "A page of images relating to a product, its theme, intended users, and context. It helps stimulate ideas in terms of colour schemes and styling. Generic themes such as nature, geometric shapes or past design movements can also be used." },
+      { q: "What does SCAMPER stand for?", a: "S - Substitute\nC - Combine\nA - Adapt\nM - Modify\nP - Put to another use\nE - Eliminate\nR - Reverse\n\nA tool that generates ideas by encouraging a focus on improving existing products." },
+      { q: "What are Freehand Sketches and why are they useful?", a: "Quick, hand-drawn initial ideas used to generate and record design concepts. They are a good way of communicating thoughts and ideas to the client and user, and allow the designer to see how ideas have progressed." },
+      { q: "What is Rendering in design?", a: "Adding line tone, colour and texture to a drawing to make it look realistic and reflect the final look of the product. Renderings are usually 3D and can be completed by hand, or on a PC or tablet using CAD software." },
+      { q: "What is Orthographic Projection?", a: "A two-dimensional drawing that represents a three-dimensional object, showing several elevations and dimensions. Also called a working drawing, it is drawn to scale with accurate dimensions, materials and tolerances for manufacture." },
+      { q: "What is Modelling in the design process?", a: "Creating physical working models by manipulating materials to see if a concept works. Useful for testing mechanical functions, evaluating form, and thinking through construction, size, proportion and materials." },
+      { q: "What is Computer-Aided Design (CAD)?", a: "Software used to create, refine and develop 3D design models on a computer. CAD allows designs to be rendered, shaded, textured and viewed from all angles. Models can be printed via 3D printing or used for computer-aided manufacture (CAM)." },
+      { q: "What is an Attribute Analysis (Star Diagram)?", a: "An evaluation method that grades a design against a number of criteria on a scale. Points are joined to form a star shape - a result nearest the outer edge indicates the design best meets that criterion." },
+      { q: "What is a SWOT Analysis?", a: "A design evaluation tool that assesses:\n• Strengths\n• Weaknesses\n• Opportunities\n• Threats\n\nIt helps evaluate design ideas against a range of criteria." },
+      { q: "What is the Traffic Lights evaluation method?", a: "A visual method for reviewing progress against each design criterion:\n• Green = go (criterion met)\n• Amber/Yellow = working but needs developing\n• Red = stop (criterion not met)" },
+      { q: "What is an Isometric Drawing?", a: "A 3D image that looks realistic, drawn on a 30-degree grid. Isometric drawings are used to present ideas clearly and show a product's form without the distortion of perspective." },
+      { q: "What is a Perspective Drawing?", a: "A 3D image where the horizon can be changed for different views. Perspective drawings show how an object looks in real life with converging lines, making them appear more lifelike than isometric drawings." },
+      { q: "What is an Exploded View drawing?", a: "A drawing that shows all the separate parts of an assembly and how they would link together. Exploded views are used to communicate how a product is constructed and assembled." },
+      { q: "What are Working Drawings (2D drawings)?", a: "Formal drawings used for manufacture that show the completed product and sub-assembly details. They have accurate dimensions, materials and tolerances. They may use orthographic projection and are drawn to scale." },
+      { q: "What is a Sketch Model (Mock-up)?", a: "A quick, simple model of a design made from soft materials such as card or paper. It is a good starting point to see the initial shape or form of a design before more detailed models are made." },
+      { q: "What is a Scale Model?", a: "A model that is proportional in size to the final outcome. Scale models are used when the actual product would be too large or small to model at full size." },
+    ]
+  },
+  {
+    id: "1.3", title: "Materials & Manufacturing",
+    cards: [
+      { q: "What factors are considered when selecting final materials?", a: "• Finish (aesthetics)\n• Cost\n• Availability\n• Whether machines and equipment are available to make the required pieces\n• Fixtures and fittings needed\n• Skills required to manufacture the specific parts" },
+      { q: "What is Materials Testing and why is it carried out?", a: "Testing materials to establish if they are fit for purpose - that they do the job they are supposed to do. Tests include: density, heat/melting point, tensile, izod impact, conductivity/insulation, and hardness tests." },
+      { q: "What is a Materials and Cutting List?", a: "A document listing all materials and components that make up a design. For each part it records: name, material, quantity, length (mm), width (mm), and thickness (mm). It is a major planning tool for the making activity." },
+      { q: "What is a Flowchart in manufacturing planning?", a: "A diagram showing a sequence of operations in a process or work flow. Instructions are in rectangular boxes; decisions (quality and safety checks) are in diamond-shaped boxes. Start and end points are in terminal (oval) shapes." },
+      { q: "What is a Manufacturing Plan?", a: "A detailed table more comprehensive than a flowchart. It lists instructions for each stage of manufacture (marking out, cutting, wasting, finishing, fitting, assembly, testing) along with quality control checks, time allocation, health and safety, and tooling/machinery." },
+      { q: "What is Marking Out?", a: "Drawing on raw materials to mark out sizes from drawings in preparation for cutting. A datum (accurate reference line) must be prepared first. Always check sizes for quality control before marking out and machining." },
+      { q: "What is a Datum?", a: "The point used as a reference point for all measurements when marking out material. An accurate datum line ensures all dimensions are measured consistently, reducing errors in cutting and shaping." },
+      { q: "What are the four main categories of manufacturing processes?", a: "• Shaping/Cutting (e.g. sawing, laser cutting, shearing)\n• Wasting (e.g. turning, milling, drilling, routing)\n• Forming/Moulding (e.g. vacuum forming, injection moulding)\n• Finishing (e.g. painting, polishing, laminating)\n• Joining (e.g. adhesives, welding, fitting)" },
+      { q: "What is Vacuum Forming?", a: "A forming process used with plastics. A plastic sheet is heated until soft, then stretched over a mould while a vacuum pulls it tight to form the shape. Used in industry for packaging, car parts and product casings." },
+      { q: "What is Line Bending?", a: "A forming process for plastics where the material is heated along a specific line using a strip heater until soft enough to bend to a required angle. The plastic retains its shape once cooled." },
+      { q: "What is Injection Moulding?", a: "A moulding process used for plastics. Molten plastic is injected under pressure into a mould, cooled, and ejected. Used for high-volume manufacture of complex shapes. The mould is expensive but cost per unit is low." },
+      { q: "What are the two main types of joining methods?", a: "• Permanent joining - the parts cannot be separated without damage (e.g. welding, epoxy adhesive, rivets)\n• Non-permanent joining - parts can be taken apart for maintenance or recycling (e.g. nuts and bolts, knock-down fittings, screws)" },
+      { q: "What are Standard Components?", a: "Pre-prepared parts used in the production of many products. Examples include nuts, bolts, batteries and electronic components. Made by specialist companies in large quantities to keep costs low." },
+      { q: "What are Knock-Down (KD) Fittings?", a: "Fittings that can be easily put together using basic tools (screwdriver, drill, hammer). They temporarily or permanently fix materials together and are common in flat-pack furniture. They reduce manufacturing costs by shifting assembly to the consumer." },
+      { q: "What is a Tolerance in manufacturing?", a: "The acceptable margin of error in a measurement when marking out materials ready for cutting and shaping. For example, a 1% tolerance on a 1000mm rod means it can be between 990mm and 1010mm and still pass a quality control check." },
+      { q: "What adhesives are commonly used in product manufacture?", a: "• Superglue - paper/card, wood, plastics, metals\n• Epoxy resin - paper/card, electronics, wood, plastics, metals\n• PVA - wood\n• Hot melt glue - paper/card, electronics\n• Contact adhesive - paper/card, plastics\n• Solvent adhesive - plastics" },
+      { q: "What finishing processes are used in manufacture?", a: "• Laminating - paper/card, electronics, wood, plastics\n• Painting (oil/solvent/water based) - wood, metals\n• Polishing - wood, plastics, metals\n• Powder coating - metals\n\nFinishing protects the material and improves aesthetics." },
+    ]
+  },
+  {
+    id: "1.4", title: "Evaluation",
+    cards: [
+      { q: "What is Formative Evaluation?", a: "Evaluation that is carried out continuously during the development of a product. Information is gathered from questionnaires, surveys or opinions. Results help develop the product and ensure it meets the design specification." },
+      { q: "What is Summative Evaluation?", a: "Evaluation carried out on a finished product, usually resulting in a detailed report. The product is thoroughly analysed to ensure it does what was intended and, if it does not, how to improve it." },
+      { q: "What is Disassembly and why is it useful?", a: "The taking apart of a product to look carefully at how it is made, the materials used, and processes involved in manufacture. It provides knowledge about assembly methods, functionality, materials and aesthetics." },
+      { q: "What is Evaluating Against the Specification?", a: "Comparing design ideas and developments to the specification to ensure they do not deviate from the original idea. Some specification points will be met and some will not. The designer works with the client and end user to decide whether to modify the idea or reconsider the specification." },
+      { q: "What is a User Trial or Field Test?", a: "A semi-controlled test by intended users working with either a prototype or the finished product. The test looks for specific responses. Results are collected and the design team evaluates the information to help develop the product." },
+      { q: "How are Questionnaires used in evaluation?", a: "Used in market research to gather information about products or possible products. Carried out via internet questionnaires, telephone conversations and face-to-face interviews. The information gathered informs the designer about user preferences." },
+      { q: "What is Commercial Testing?", a: "Detailed and controlled testing carried out in laboratory conditions. Tests are set up to investigate how products respond to certain conditions. Examples include crash testing, wind tunnel experiments, and functional testing." },
+      { q: "What is a Peer Review?", a: "Tests carried out by peers - classmates or colleagues - who work together to establish any faults or problems with a design in an informal way. Useful for obtaining honest feedback." },
+      { q: "What is Continual Improvement (CI)?", a: "An ongoing improvement process at every stage of design and making to produce better products and services. Improvements come through incremental, small gains over time. A famous CI process is Kaizen, successfully implemented by companies like Toyota." },
+      { q: "Why should evaluation be continual throughout the design process?", a: "The design is continually checked and reviewed at every stage. Evaluation ensures the design does not deviate from the brief and specification, identifies areas for improvement early, and helps develop the product." },
+      { q: "What is the difference between a prototype and a finished product in testing?", a: "A prototype is an early model used to test and evaluate design ideas before final manufacture. Testing on a prototype allows modifications to be made cheaply. A finished product is evaluated by summative evaluation after manufacture is complete." },
+      { q: "Why do companies continually re-evaluate and redesign products?", a: "No product is perfect. Companies constantly look at their products to see if they can be improved for the customer. Changes are often very small, but sometimes products are redesigned due to technology changes and other factors." },
+    ]
+  },
+  {
+    id: "1.5", title: "Health & Safety",
+    cards: [
+      { q: "Why is health and safety important in the workplace?", a: "There is always potential for accidents in schools, businesses, factories and workplaces. Owners and managers have a responsibility to ensure people working there are safe. Health and safety laws protect employers and employees." },
+      { q: "What is a Risk Assessment?", a: "An examination of the possible risks in an area and a statement of how they should be managed. Carrying out risk assessments is very important in reducing and managing accidents." },
+      { q: "What is Personal Protective Equipment (PPE)?", a: "Clothing and equipment designed to protect a person working in a making environment. Examples include goggles, aprons/overalls, dust masks, visors, sensible footwear and ear defenders. PPE is matched to the specific hazard." },
+      { q: "What PPE is used for drilling, wasting, sanding and polishing?", a: "• Goggles/visor - protects against dust, sparks and particles in the eyes\n• Dust mask - protects against breathing in dust, sparks and particles" },
+      { q: "What PPE is required for noisy workshop activities such as grinding?", a: "• Ear defenders - protect against ear damage from prolonged exposure to noise" },
+      { q: "Name six general workshop safety rules.", a: "• Do not run - you may trip and fall into machinery\n• Wear appropriate PPE\n• Tidy away and clean up all resources after use\n• Place bags/equipment not in use in a designated storage area\n• Know the location of emergency exits, fire extinguishers, first aid kit and emergency stops\n• Ask a teacher if unsure" },
+      { q: "What is COSHH?", a: "Control of Substances Hazardous to Health - a set of regulations designed to ensure the safe control of hazardous substances. It is a UK-based regulation requiring employers to control substances hazardous to health." },
+      { q: "Name four COSHH hazard symbols and what they mean.", a: "• Corrosive - substance damages living tissue or materials\n• Flammable - substance can easily catch fire\n• Toxic - substance is poisonous and can cause death or serious harm\n• Harmful - substance causes limited health risks" },
+      { q: "What is Out-sourcing?", a: "The use of a third party contractor to carry out work and supply services. Products may be designed in one country but manufactured by a different company elsewhere." },
+      { q: "What is Off-shoring?", a: "The movement of a company's operations, such as manufacturing or commerce, to another country, often to save costs. Companies do this to take advantage of lower labour costs and increased profits." },
+      { q: "What are a designer's responsibilities for health and safety?", a: "• Products must be safe to use and meet safety standards (e.g. BSI, CE marking)\n• Products must be correctly labelled with safety warnings\n• Quality assurance and quality control checks must be implemented\n• Designers must consider whether materials are toxic and whether the product is safe" },
+      { q: "What is the CE marking and what does it indicate?", a: "A marking that ensures a product complies with EU safety and legislation, allowing it to be sold throughout the European Economic Area (EEA). It is one of the standards that designers and companies use to produce quality, safe products." },
+    ]
+  },
+  {
+    id: "1.6", title: "CAD/CAM & Production Systems",
+    cards: [
+      { q: "What is Computer-Aided Design (CAD)?", a: "The use of computers to design products on a screen. CAD can produce 2D and 3D drawings, render photorealistic images, rotate and zoom views, test designs for stress and strain, and send designs directly to CAM machines." },
+      { q: "What are the advantages of CAD over traditional drawing methods?", a: "• Draw in 2D and 3D and change a design quickly\n• View a drawing from different angles by rotating and zooming\n• Render drawings to look photorealistic\n• Send designs directly to CAM machines\n• Test designs through software before manufacture\n• Manage production schedules and quality control" },
+      { q: "What is Computer-Aided Manufacture (CAM)?", a: "The use of computers to automate the manufacture of products and to control production processes. A 2D or 3D CAD drawing is converted into co-ordinates which the CAM machine follows to complete its operation." },
+      { q: "What is Computer-Integrated Manufacturing (CIM)?", a: "A method of production in which design, manufacture and management are linked electronically and controlled by computers. Computers monitor manufacturing, stock control, quality and output." },
+      { q: "What is a Vinyl Cutter and what does it do?", a: "A CAM machine where plastic sheet with adhesive backing is fed in and out using rollers while the tool head moves left and right. A blade cuts 2D shapes from the vinyl." },
+      { q: "What is a Laser Cutter and what materials can it cut?", a: "A CAM machine that uses a laser beam to cut 2D shapes. It can cut leather, laser plywood, paper, card, acrylic, fabric and many more. It can also etch into materials at various depths." },
+      { q: "What is a 3D Printer and how does it work?", a: "A CAM machine used to create rapid prototypes and working components. The most common type uses additive manufacturing, where a material is extruded through a nozzle and the component is built up slowly in layers." },
+      { q: "What are CNC Routers and Millers?", a: "Industrial CAM machines where a tool head cuts out, cuts slots and performs many other operations on materials such as aluminium, steel, hardwoods and manmade boards. CNC stands for Computer Numerical Control. They work from X, Y and Z co-ordinates." },
+      { q: "What is Rapid Prototyping?", a: "The use of CAM to quickly produce models or parts for testing and modelling. 3D CAD files are typically converted to a stereo lithography file (.stl) and sent to a 3D printer." },
+      { q: "What is Flexible Manufacturing Systems (FMS)?", a: "Manufacturing systems that produce products and goods using robots and computer-controlled tools and machines, without human intervention. The products can be changed easily by using a different program." },
+      { q: "What is One-off (Job/Bespoke) Production?", a: "A production system where only one product is made at a time. It is highly skilled and labour intensive. Products are of individual high quality. Usually expensive." },
+      { q: "What is Batch Production?", a: "A production system where small quantities of the same product are made. It can be labour intensive but uses machines, automation, jigs, moulds and formers to aid repetitive tasks. The cost per item is reduced." },
+      { q: "What is Mass Production?", a: "A production system where hundreds or thousands of the same product are manufactured. The process is often automated with fewer workers. Very expensive to set up. Requires lots of quality control checks." },
+      { q: "What is Continuous Production?", a: "Similar to mass production but production never stops - often running 24 hours a day with people working in shifts. Used for products like fuels, oils, plastics and lubricants from crude oil." },
+      { q: "What is Quality Control (QC)?", a: "The process of maintaining standards in manufactured products. QC checks ensure all products meet the required standards - for example, checking print colours or checking dimensions of a component." },
+      { q: "What is an Open-Loop Control System?", a: "The most basic systems diagram with three stages:\n• Input - the signal that starts the system\n• Operation (or control) - the 'brain' that takes an input and sends a message to the output\n• Output - a response to the information from the process\n\nThe output does not feed back to control the input." },
+      { q: "What is a Closed-Loop Control System?", a: "A system that adds a Feedback link to the open-loop system. The feedback link closes the loop and sends signals from the OUTPUT back to the INPUT. This allows the system to control itself. ABS brakes are a good example." },
+      { q: "What is RFID and how is it used in manufacturing?", a: "Radio-Frequency Identification - wireless non-contact devices that use electromagnetic fields to transfer data for automatically identifying and tracking tags attached to objects. Used heavily in manufacturing and distribution." },
+    ]
+  },
+  {
+    id: "1.7", title: "Design Roles & Human Factors",
+    cards: [
+      { q: "What is the role of a Designer?", a: "Designers play an important part in creating products, solving problems and coming up with solutions. They take a design brief from a client, carry out research, write a specification and generate innovative ideas. They have social, environmental and economic responsibilities." },
+      { q: "What is an Artisan?", a: "A highly skilled person who generally produces bespoke or small numbers of high quality products or items. Examples include furniture makers and jewellery designers." },
+      { q: "What is the role of a Technologist in design?", a: "A technologist supports engineers and designers with creative solutions to technical aspects of a design, such as electronic circuitry or mechanical systems." },
+      { q: "What social considerations must a designer think about?", a: "• Avoiding exploitation of workers and traders\n• Sourcing materials local to the manufacturing area\n• Making sure working conditions are safe and of a reasonable standard\n• Using Fairtrade principles" },
+      { q: "What environmental considerations must a designer think about?", a: "• Selecting materials from sustainable sources\n• Making sure manufacturing processes do not cause pollution or toxicity\n• Making efficient use of energy during manufacturing, distribution and use\n• Making sure products can be recycled and/or reused" },
+      { q: "What economic considerations must a designer think about?", a: "• Creating jobs\n• Making sure profits are shared fairly (is anyone being exploited?)\n• Making sure production creates and maintains skills" },
+      { q: "What is Life Cycle Analysis?", a: "An analysis of each part of the product's life and journey, from creation to the end of the product's life. Designers use it to consider what happens to a product when it is broken and not needed anymore." },
+      { q: "What is 'Cradle to Cradle' thinking?", a: "A design philosophy that describes the whole life of a product from raw materials to end of life and recycling. It ensures the whole process of designing, making and what happens to the product when it is finished are all considered carefully, so nothing is wasted." },
+      { q: "What is Ergonomics?", a: "The study of the way products can be designed so that they produce the best experience for users - how end users interact with products and systems, such as how they hold them, wear them, or use specific features. Also known as human factors." },
+      { q: "What is Anthropometrics?", a: "The study of human sizes and measurements and how they relate to products. Scientists have measured thousands of people to produce mathematical data sets used by designers. Designers design for the 5th to 95th percentile." },
+      { q: "What does designing for the 5th to 95th percentile mean?", a: "Anthropometric data follows a bell curve. The 50th percentile is the average. Designers design between the 5th and 95th percentile to meet most people's needs, excluding only the very smallest and very largest 5% at each end." },
+      { q: "What is Planned Obsolescence?", a: "The deliberate creation of a product with a limited life. Manufacturers intentionally design the product to become obsolete after a certain period through software upgrades, material failure, component failure or compatibility issues." },
+      { q: "What is Inclusive Design?", a: "Where everyday products and services are designed to be accessible to, and usable by, as many people as possible. Contrasts with exclusive design, where products are designed for a specific user group." },
+    ]
+  },
+  {
+    id: "1.8", title: "Aesthetics & Design Movements",
+    cards: [
+      { q: "What is Biomimicry in design?", a: "Using structures, shapes and forms found in nature to create innovative design solutions. Examples: Velcro inspired by plant seeds, the Mercedes 'Bionic' car inspired by aquatic life, the Gherkin building inspired by a flower bud." },
+      { q: "What is Form and Function in design ideas?", a: "Form is the physical shape and appearance of something. Function is the job that a product is designed to do. Starting points include organic shapes, geometry, nature, cultural inspiration and biomimicry." },
+      { q: "What is the Primary Function of a product?", a: "The main purpose of what a product is designed to do. For example, the primary function of a business card is to give information about a person professionally." },
+      { q: "What is the Secondary Function of a product?", a: "A function that a product has in addition to its main function. Secondary functions often relate to cleaning, maintenance, styling and storage." },
+      { q: "What does 'Form Follows Function' mean?", a: "A quote attributed to modernist architect Louis Sullivan. When designing a product or building, what it is intended to do should be considered first, and what it will look like should be considered second." },
+      { q: "What is Aesthetics in product design?", a: "Concerned with the visual quality of an item or design - what makes it beautiful. Elements include: shape, form, proportion, balance, symmetry, pattern, colour and texture." },
+      { q: "How is Colour used in product design?", a: "Colour can be used for function and aesthetics. Examples: green for go and red for stop. Warm/cool colours, bold colours, tints, shades and natural colours can all have dramatic effects on styling." },
+      { q: "How is Texture used in product design?", a: "Texture can be added for functional reasons (e.g. grip on a golf club handle) or for decorative reasons. Some materials like wood and leather have natural textures. Other materials have textures added during manufacturing." },
+      { q: "What are the four broad categories of Style?", a: "• Classical\n• Modern\n• Functional\n• Hi-tech\n\nStyle is the interaction of aesthetic elements such as shape, form, pattern, texture, colour and proportion." },
+      { q: "What was the Arts and Crafts design movement?", a: "Possibly the first design movement, started by William Morris in the 1880s. A philosophy of craftmanship over mechanisation, reacting against industrialisation and mass production. Very floral designs with animal and Celtic motifs." },
+      { q: "What was the Art Nouveau design movement?", a: "Developed the Arts and Crafts movement with very organic styling using natural forms and curved lines. Unlike Arts and Crafts, it accepted mass production. Key designers: Charles Rennie Mackintosh, Louis Comfort Tiffany." },
+      { q: "What was the Art Deco design movement?", a: "A reaction to Art Nouveau, influenced by Cubism. Very geometric in styling with strong vertical lines, zig zags and sharp angles. Bold colours and new modern materials. Key designers: Eileen Gray, Clarice Cliff." },
+      { q: "What was the Bauhaus design movement?", a: "A school of art and architecture founded in Germany by Walter Gropius. Pioneering in combining art and technology. Designed prototypes intended for mass production. Key designers: Marcel Breuer, Wassily Kandinsky." },
+      { q: "What was the Modernism design movement?", a: "Tried to simplify and minimise design, making items standardised and cultureless. Uses new and modern materials and manufacturing processes. Key designers: Isamu Noguchi, Charles and Ray Eames, Verner Panton." },
+      { q: "What was the Postmodernism (Memphis) design movement?", a: "A reaction to the minimalism of Modernism. Used bold, shocking and strong primary colours with deep texture. Geometric shapes with plastics and laminates. Key designer: Ettore Sottsass." },
+      { q: "What is Blobism as a design style?", a: "A very modern style with strong curvature that is often irregular. Heavy use of CAD/CAM. Bright colours, minimal and often contrasting. Materials are usually plastics, composites, alloys, metals. Key designers: Karim Rashid, Jonathan Ive, Marc Newson." },
+      { q: "What is Inclusive Design?", a: "Where everyday products and services are designed to be accessible to, and usable by, as many people as possible. Contrasts with exclusive design, where products are designed for a specific user group." },
+    ]
+  },
+  {
+    id: "1.9", title: "Energy & Sustainability",
+    cards: [
+      { q: "What are Fossil Fuels and how are they formed?", a: "Oil, gas and coal. Created from animals and plants that died millions of years ago, compressed under natural deposits with heat and pressure into carbon-rich deposits. They are finite - they take millions of years to produce." },
+      { q: "What are the properties and uses of Coal as an energy source?", a: "Very common and found all over the world. Relatively easy to extract but extremely labour intensive and dangerous. When burnt, produces high heat used for cooking, heating and creating electricity. It is a finite fossil fuel." },
+      { q: "What are the properties and uses of Oil as an energy source?", a: "Found deep underground in large reservoirs. Holes are drilled until the oil is found, then pumped out. Can be converted into fuels such as petrol and diesel. Also turned into plastics. An extremely valuable finite resource." },
+      { q: "What is Nuclear Energy and what are its advantages and disadvantages?", a: "Used in many developed nations. Considered relatively clean compared to burning coal. However, it is controversial because of the long-term effects of the waste material produced. It is also very expensive to set up." },
+      { q: "What are Renewable Energy Sources?", a: "Alternatives to fossil fuels and nuclear energy, considered infinite as the energy is produced naturally by the Earth. The sun, wind, seas, rivers and underground sources of heat can all be utilised to produce energy." },
+      { q: "Name and describe six types of renewable energy.", a: "• Solar photovoltaic - sun's rays converted to electricity\n• Wind - wind turns turbine blades to generate electricity\n• Hydroelectricity - water flows through turbines\n• Solar thermal - sun's heat used to heat water\n• Geothermal - cold water pumped deep underground, returns hot\n• Wave/Tidal energy - power of waves or tides drives turbines\n• Biomass - gases from dead organisms burnt to generate electricity" },
+      { q: "What is the difference between finite and infinite energy sources?", a: "Finite sources (fossil fuels) take millions of years to produce and can only be extracted once. Infinite/renewable sources (solar, wind, hydro etc.) are produced naturally and continuously by the Earth, so they will not run out." },
+      { q: "What are the Six R's of sustainability?", a: "• Reduce - your use of electricity, quantities of products\n• Reuse - packaging, materials and items a second time\n• Recycle - materials and put them to use in other applications\n• Rethink - the way you do things\n• Repair - items rather than throwing them away\n• Refuse - to buy a product if you do not need it" },
+      { q: "What is Recycling and why is it important?", a: "Reduces environmental damage by using products again, eliminating the need for more raw materials. Products such as aluminium cans, glass bottles, clothing, paper and card are commonly recycled." },
+      { q: "What are Composite Materials and why are they difficult to recycle?", a: "Materials joined together when manufactured. They are usually very difficult to recycle back into their original materials. Examples include: concrete, drinks cartons, MDF board and printed circuit boards." },
+      { q: "What is Planned Obsolescence and give examples of how it occurs?", a: "Designing products with a limited life so they become obsolete after a certain period. May occur through: software upgrades, material failure, component failure, product assembly problems, compatibility issues." },
+      { q: "What is Designing for Disassembly?", a: "Designing products that can be taken apart using common tools and equipment. This makes it easier to replace or repair parts, extends the product's life, and reduces waste. It also allows parts to be easily accessed for recycling." },
+      { q: "What are Plastic Recycling Symbols and what do they indicate?", a: "Thermoplastics can be recycled and are stamped with a recycling triangle containing a number (1-7):\n• 01 PET/PETE\n• 02 HDPE\n• 03 PVC\n• 04 LDPE\n• 05 PP\n• 06 PS\n• 07 Other plastics\n\nThermosetting plastics cannot be recycled." },
+      { q: "How can designers make efficient use of energy sources?", a: "Switch off lights when not needed, close doors to keep hot/cold air inside, avoid taking a car when you could walk or cycle. Designers can also create products that do not require mains electricity - examples include the clockwork radio." },
+    ]
+  },
+];
+
+// ═══════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════
+
+let state = {
+  // Quiz
+  questions: [],
+  currentIndex: 0,
+  score: 0,
+  results: [],
+  selectedAnswer: null,
+  hasAnswered: false,
+  totalQuestions: 10,
+  shuffledAnswers: [],
+
+  // Flashcard
+  currentTopic: null,
+  fcIndex: 0,
+};
+
+// ═══════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════
+
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  if (name === 'flashcard-topics') renderTopicList();
+}
+
+function mainMenu() {
+  showScreen('menu');
+}
+
+// ═══════════════════════════════════════
+// QUIZ LOGIC
+// ═══════════════════════════════════════
+
+document.getElementById('bank-count').textContent = quizQuestions.length + ' questions in the bank';
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function startQuiz(count) {
+  state.totalQuestions = count;
+  state.questions = shuffle(quizQuestions).slice(0, count);
+  state.currentIndex = 0;
+  state.score = 0;
+  state.results = [];
+  state.selectedAnswer = null;
+  state.hasAnswered = false;
+  loadShuffledAnswers();
+  showScreen('quiz');
+  renderQuestion();
+}
+
+function loadShuffledAnswers() {
+  const q = state.questions[state.currentIndex];
+  state.shuffledAnswers = shuffle([q.correctAnswer, ...q.wrongAnswers]);
+}
+
+function renderQuestion() {
+  const q = state.questions[state.currentIndex];
+
+  // Update header
+  document.getElementById('q-progress').textContent =
+    `Question ${state.currentIndex + 1} of ${state.totalQuestions}`;
+  const answered = state.results.length;
+  document.getElementById('q-score').textContent =
+    `Score: ${state.score}/${answered}`;
+  const pct = (state.currentIndex / state.totalQuestions) * 100;
+  document.getElementById('q-progress-bar').style.width = pct + '%';
+
+  // Build question HTML
+  const answersHtml = state.shuffledAnswers.map((ans, idx) => {
+    let cls = 'answer-btn';
+    let icon = '';
+    if (state.hasAnswered) {
+      if (ans === q.correctAnswer) { cls += ' correct'; icon = '<span class="answer-icon">✅</span>'; }
+      else if (ans === state.selectedAnswer) { cls += ' wrong'; icon = '<span class="answer-icon">❌</span>'; }
+    } else if (ans === state.selectedAnswer) {
+      cls += ' selected';
+    }
+    const disabled = state.hasAnswered ? 'disabled' : '';
+    return `<button class="${cls}" ${disabled} onclick="selectAnswer(${idx})">
+      <span>${escHtml(ans)}</span>${icon}
+    </button>`;
+  }).join('');
+
+  let feedbackHtml = '';
+  if (state.hasAnswered) {
+    const correct = state.selectedAnswer === q.correctAnswer;
+    feedbackHtml = `<div class="feedback ${correct ? 'correct' : 'wrong'}">
+      <div class="fb-icon">${correct ? '✅' : '❌'}</div>
+      <div class="fb-text">
+        <strong class="${correct ? 'c' : 'w'}">${correct ? 'Correct!' : 'Incorrect'}</strong>
+        ${!correct ? `<p>The correct answer is:<br><span class="correct-ans">${escHtml(q.correctAnswer)}</span></p>` : ''}
+      </div>
+    </div>`;
+  }
+
+  document.getElementById('quiz-body').innerHTML = `
+    <div class="question-text">${escHtml(q.question)}</div>
+    <div class="answers">${answersHtml}</div>
+    ${feedbackHtml}
+  `;
+
+  // Next button
+  const nextWrap = document.getElementById('next-wrap');
+  if (state.hasAnswered) {
+    nextWrap.style.display = 'block';
+    const isLast = state.currentIndex + 1 >= state.totalQuestions;
+    document.getElementById('next-btn').textContent = isLast ? 'See Results' : 'Next Question';
+  } else {
+    nextWrap.style.display = 'none';
+  }
+}
+
+function selectAnswer(idx) {
+  if (state.hasAnswered) return;
+  const answer = state.shuffledAnswers[idx];
+  const q = state.questions[state.currentIndex];
+  state.selectedAnswer = answer;
+  state.hasAnswered = true;
+
+  const isCorrect = answer === q.correctAnswer;
+  if (isCorrect) state.score++;
+
+  state.results.push({
+    question: q.question,
+    correctAnswer: q.correctAnswer,
+    selectedAnswer: answer,
+    wasCorrect: isCorrect,
+  });
+
+  // Bounce score
+  const scoreEl = document.getElementById('q-score');
+  if (isCorrect) {
+    scoreEl.classList.add('bounce');
+    setTimeout(() => scoreEl.classList.remove('bounce'), 400);
+  }
+
+  renderQuestion();
+}
+
+function nextQuestion() {
+  const isLast = state.currentIndex + 1 >= state.totalQuestions;
+  if (isLast) {
+    showResults();
+    return;
+  }
+  state.currentIndex++;
+  state.selectedAnswer = null;
+  state.hasAnswered = false;
+  loadShuffledAnswers();
+  renderQuestion();
+}
+
+function showResults() {
+  showScreen('results');
+  const pct = Math.round((state.score / state.totalQuestions) * 100);
+
+  // Icon & grade
+  let icon, grade, color;
+  if (pct === 100) { icon = '⭐'; grade = 'PERFECT SCORE!'; color = 'var(--green)'; }
+  else if (pct >= 90) { icon = '⭐'; grade = 'Outstanding!'; color = 'var(--green)'; }
+  else if (pct >= 75) { icon = '👍'; grade = 'Great work!'; color = 'var(--green)'; }
+  else if (pct >= 60) { icon = '😊'; grade = 'Good effort!'; color = 'var(--green)'; }
+  else if (pct >= 40) { icon = '📖'; grade = 'Keep practising!'; color = 'var(--orange)'; }
+  else { icon = '✏️'; grade = 'More revision needed!'; color = 'var(--red)'; }
+
+  document.getElementById('res-icon').textContent = icon;
+  document.getElementById('res-grade').textContent = grade;
+  document.getElementById('res-grade').style.color = color;
+  document.getElementById('res-pct').style.color = color;
+  document.getElementById('res-score-text').textContent =
+    `You scored ${state.score} out of ${state.totalQuestions}`;
+
+  // Animate percentage
+  animatePct(pct);
+
+  // Result rows
+  const rowsEl = document.getElementById('result-rows');
+  rowsEl.innerHTML = state.results.map((r, i) => `
+    <div class="result-row ${r.wasCorrect ? 'rr-correct' : 'rr-wrong'}" onclick="toggleRow(${i})">
+      <div class="rr-header">
+        <span class="rr-icon">${r.wasCorrect ? '✅' : '❌'}</span>
+        <span class="rr-num">Q${i + 1}</span>
+        <span class="rr-q">${escHtml(r.question)}</span>
+        <span class="rr-chevron">▾</span>
+      </div>
+      <div class="rr-detail">
+        ${!r.wasCorrect ? `<div class="det-row"><span class="det-label">Your answer:</span><span class="det-wrong">${escHtml(r.selectedAnswer)}</span></div>` : ''}
+        <div class="det-row"><span class="det-label">Correct answer:</span><span class="det-correct">${escHtml(r.correctAnswer)}</span></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function animatePct(target) {
+  const el = document.getElementById('res-pct');
+  const steps = Math.min(target, 30);
+  if (steps === 0) { el.textContent = '0%'; return; }
+  const interval = 600 / steps;
+  let step = 0;
+  const timer = setInterval(() => {
+    step++;
+    el.textContent = Math.round(target * step / steps) + '%';
+    if (step >= steps) clearInterval(timer);
+  }, interval);
+}
+
+function toggleRow(i) {
+  const rows = document.querySelectorAll('.result-row');
+  rows[i].classList.toggle('expanded');
+}
+
+// ═══════════════════════════════════════
+// FLASHCARDS
+// ═══════════════════════════════════════
+
+function renderTopicList() {
+  const list = document.getElementById('topic-list');
+  list.innerHTML = flashcardTopics.map((t, i) => `
+    <button class="topic-item" style="animation-delay:${i * 0.05}s" onclick="openTopic(${i})">
+      <span class="tid">${escHtml(t.id)}</span>
+      <span class="ttitle">${escHtml(t.title)}</span>
+      <span class="tcount">${t.cards.length} cards</span>
+      <span class="tchev">›</span>
+    </button>
+  `).join('');
+}
+
+function openTopic(index) {
+  state.currentTopic = flashcardTopics[index];
+  state.fcIndex = 0;
+  showScreen('flashcard-view');
+  document.getElementById('fc-topic-title').textContent =
+    state.currentTopic.id + ' ' + state.currentTopic.title;
+  document.getElementById('flashcard').classList.remove('flipped');
+  renderCard();
+}
+
+function renderCard() {
+  const topic = state.currentTopic;
+  const card = topic.cards[state.fcIndex];
+  const total = topic.cards.length;
+
+  document.getElementById('fc-counter').textContent = `${state.fcIndex + 1} / ${total}`;
+  document.getElementById('fc-progress-bar').style.width = ((state.fcIndex + 1) / total * 100) + '%';
+
+  const qEl = document.getElementById('fc-question');
+  const aEl = document.getElementById('fc-answer');
+
+  qEl.innerHTML = `<p>${escHtml(card.q)}</p>`;
+  const hasBullets = card.a.includes('•') || card.a.includes('- ');
+  aEl.className = 'card-text' + (hasBullets ? ' bullet' : '');
+  aEl.innerHTML = `<p>${escHtml(card.a).replace(/\n/g, '<br>')}</p>`;
+
+  document.getElementById('fc-prev').disabled = state.fcIndex === 0;
+  document.getElementById('fc-next').disabled = state.fcIndex >= total - 1;
+}
+
+function flipCard() {
+  document.getElementById('flashcard').classList.toggle('flipped');
+}
+
+function fcNavigate(dir) {
+  const newIndex = state.fcIndex + dir;
+  if (newIndex < 0 || newIndex >= state.currentTopic.cards.length) return;
+  document.getElementById('flashcard').classList.remove('flipped');
+  setTimeout(() => {
+    state.fcIndex = newIndex;
+    renderCard();
+  }, 150);
+}
+
+// ═══════════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════════
+
+function escHtml(str) {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+</script>
+</body>
+</html>
