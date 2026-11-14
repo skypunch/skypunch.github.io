@@ -5,292 +5,132 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>About Me</title>
   <style>
-    /* ── Reset & Variables ── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --sky-light:   #e0f2fe;
-      --sky-mid:     #7dd3fc;
-      --sky-core:    #0ea5e9;
-      --sky-deep:    #0369a1;
-      --sky-night:   #0c4a6e;
-      --white:       #ffffff;
-      --text-dark:   #0f172a;
-      --text-mid:    #334155;
-      --text-light:  #64748b;
-      --card-bg:     rgba(255, 255, 255, 0.70);
-      --radius:      0.25rem;
-      --transition:  0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      --ink:  #0b2a3d;
+      --soft: #2f5268;
+      --ring: #5b88b5;
     }
-
-    html { scroll-behavior: smooth; }
 
     body {
-      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-      color: var(--text-dark);
-      background: var(--sky-night);
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    /* ── Animated Sky Background ── */
-    .sky-bg {
-      position: fixed;
-      inset: 0;
-      z-index: -1;
-      background: linear-gradient(
-        160deg,
-        #bae6fd 0%,
-        #7dd3fc 25%,
-        #38bdf8 55%,
-        #0284c7 80%,
-        #0c4a6e 100%
-      );
-      background-size: 400% 400%;
-      animation: skyShift 18s ease infinite;
-    }
-
-    @keyframes skyShift {
-      0%   { background-position: 0% 50%; }
-      50%  { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    /* Floating cloud blobs */
-    .clouds {
-      position: fixed;
-      inset: 0;
-      z-index: -1;
-      pointer-events: none;
-      overflow: hidden;
-    }
-
-    .cloud {
-      position: absolute;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      filter: grayscale(1) brightness(2.0) blur(6px);
-      animation: drift linear infinite;
-      line-height: 1;
-      user-select: none;
-    }
-
-    .cloud:nth-child(1) { font-size: 220px; top:  6%; left: -20%; animation-duration: 70s; }
-    .cloud:nth-child(2) { font-size: 170px; top: 20%; left: -20%; animation-duration: 90s;  animation-delay: -30s; }
-    .cloud:nth-child(3) { font-size: 240px; top: 52%; left: -20%; animation-duration: 110s; animation-delay: -55s; }
-    .cloud:nth-child(4) { font-size: 150px; top: 73%; left: -10%; animation-duration: 60s;  animation-delay: -15s; }
-
-    @keyframes drift {
-      from { transform: translateX(0); }
-      to   { transform: translateX(120vw); }
-    }
-
-    /* ── Layout ── */
-    main {
-      max-width: 860px;
-      margin: 0 auto;
-      padding: 3rem 1.5rem 6rem;
-    }
-
-    /* ── Hero ── */
-    .hero {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      gap: 1.75rem;
-      padding: 1.75rem 2rem;
-      background: var(--card-bg);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      border: 1px solid rgba(255,255,255,0.55);
-      border-radius: var(--radius);
-      box-shadow:
-        0 8px 32px rgba(12, 74, 110, 0.20),
-        inset 0 1px 0 rgba(255,255,255,0.8);
-      animation: fadeUp 0.8s var(--transition) both;
-    }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Portrait placeholder */
-    .portrait-wrap {
-      position: relative;
-      width: 180px;
-      height: 180px;
-      flex-shrink: 0;
-    }
-
-    .portrait-wrap::before {
-      content: '';
-      position: absolute;
-      inset: -4px;
-      border-radius: 50%;
-      background: conic-gradient(
-        var(--sky-core), var(--sky-mid), var(--sky-light),
-        var(--sky-mid), var(--sky-core)
-      );
-      animation: spin 6s linear infinite;
-      z-index: 0;
-    }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .portrait {
-      position: relative;
-      z-index: 1;
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      object-fit: cover;
-      background: linear-gradient(135deg, var(--sky-light) 0%, var(--sky-mid) 100%);
-      border: 4px solid var(--white);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-    }
-
-    .hero-name {
-      font-size: clamp(2rem, 5vw, 3rem);
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      background: linear-gradient(135deg, var(--sky-deep), var(--sky-night));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .hero-tagline {
+      font-family: Georgia, 'Times New Roman', serif;
       font-size: 1.1rem;
-      color: var(--text-mid);
-      max-width: 480px;
-      line-height: 1.6;
+      line-height: 1.7;
+      color: var(--ink);
+      background: #5b7fa8;
+      min-height: 100vh;
+      /* Leaves the top of the first screen clear so the photo is seen before the text */
+      padding: 58vh 1rem 3rem;
+      --pad: 2.5rem;
     }
 
-    /* ── Section cards ── */
-    .section {
-      margin-top: 2rem;
-      padding: 2.25rem 2.5rem;
-      background: var(--card-bg);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      border: 1px solid rgba(255,255,255,0.55);
-      border-radius: var(--radius);
-      box-shadow:
-        0 4px 24px rgba(12, 74, 110, 0.15),
-        inset 0 1px 0 rgba(255,255,255,0.75);
-      animation: fadeUp 0.8s var(--transition) both;
+    /* Fixed layer rather than background-attachment: fixed, which is unreliable on iOS */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background: url('background.jpg') center 40% / cover no-repeat;
     }
 
-    .section:nth-of-type(2) { animation-delay: 0.10s; }
-    .section:nth-of-type(3) { animation-delay: 0.20s; }
-    .section:nth-of-type(4) { animation-delay: 0.30s; }
-    .section:nth-of-type(5) { animation-delay: 0.40s; }
+    .page {
+      max-width: 40rem;
+      margin: 0 auto;
+      padding: var(--pad);
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 6px;
+    }
 
-    .section-header {
-      display: flex;
-      align-items: center;
-      gap: 0.7rem;
+    .photo {
+      display: block;
+      width: 150px;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 4px solid #fff;
+      box-shadow: 0 0 0 3px var(--ring);
+      margin-top: calc(-75px - var(--pad));
       margin-bottom: 1.25rem;
     }
 
-    h2 {
-      font-size: 1.2rem;
+    h1 {
+      font-size: clamp(2rem, 6vw, 2.75rem);
+      line-height: 1.15;
       font-weight: 700;
-      color: var(--sky-night);
     }
 
-    p {
-      color: var(--text-mid);
-      line-height: 1.8;
-      font-size: 0.975rem;
+    .tagline {
+      font-style: italic;
+      color: var(--soft);
+      margin-top: 0.4rem;
+    }
+
+    h2 {
+      font-size: 1.3rem;
+      margin-top: 2.75rem;
+      margin-bottom: 0.5rem;
     }
 
     p + p { margin-top: 0.9rem; }
 
-    /* ── Footer ── */
+    a { color: inherit; text-underline-offset: 0.15em; }
+    a:hover { text-decoration-thickness: 2px; }
+
     footer {
-      text-align: center;
-      margin-top: 3rem;
-      font-size: 0.8rem;
-      color: rgba(255,255,255,0.55);
-      letter-spacing: 0.04em;
+      margin-top: 3.5rem;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      color: var(--soft);
     }
 
-    /* ── Responsive ── */
-    @media (min-width: 600px) {
-      .hero { flex-direction: row; text-align: left; }
-    }
+    footer p + p { margin-top: 0.4rem; }
 
     @media (max-width: 480px) {
-      .section { padding: 1.5rem 1.25rem; }
+      body { padding: 58vh 0.75rem 1rem; --pad: 1.5rem; }
     }
   </style>
 </head>
 <body>
 
-  <div class="sky-bg" aria-hidden="true"></div>
-  <div class="clouds" aria-hidden="true">
-    <div class="cloud">🤜</div>
-    <div class="cloud">🤜</div>
-    <div class="cloud">🤜</div>
-    <div class="cloud">🤜</div>
-  </div>
+  <div class="page">
 
-  <main>
+    <main>
 
-    <!-- ── Hero ── -->
-    <section class="hero" aria-label="Introduction">
+      <header>
+        <img class="photo" src="july23.jpg" alt="It me">
+        <h1>Marcus Wetherell</h1>
+        <p class="tagline">International school teacher and technology enthusiast</p>
+      </header>
 
-      <div class="portrait-wrap">
-        <div class="portrait" role="img" aria-label="Portrait placeholder">
-         <img src="july23.jpg" alt="It me" style="width:100%;height:100%;object-fit:cover;display:block;" />
-        </div>
-      </div>
-
-      <div>
-
-        <h1 class="hero-name">Marcus Wetherell</h1>
-        <p class="hero-tagline">
-          International school teacher and technology enthusiast
+      <section aria-labelledby="about-heading">
+        <h2 id="about-heading">About Me</h2>
+        <p>
+          Hi! I'm Marcus. I do stuff with computers and design technology.
         </p>
 
-      </div>
-    </section>
+        <p>I like to spend time with my family, watch films (and review them on <a href="https://letterboxd.com/skypunch/">Letterboxd</a>), read novels, and play video games.</p>
+      </section>
 
-    <!-- ── About ── -->
-    <section class="section" aria-labelledby="about-heading">
-      <div class="section-header">
-        <h2 id="about-heading">About Me</h2>
-      </div>
-      <p>
-        Hi! I'm Marcus. I do stuff with computers and design technology.
-      </p>
-      
-      <p>I like to spend time with my family, watch films (and review them on <a href="https://letterboxd.com/skypunch/">Letterboxd</a>), read novels, and play video games.</p>
-    </section>
-
-
-    <!-- ── Contact ── -->
-    <section class="section" aria-labelledby="contact-heading">
-      <div class="section-header">
+      <section aria-labelledby="contact-heading">
         <h2 id="contact-heading">Get in Touch</h2>
-      </div>
-      <p style="margin-bottom:1.25rem;">
-        You can email me here: <img src="email.png" alt="Email" style="height:1.1em; vertical-align:middle;">
+        <p>
+          You can email me here: <img src="email.png" alt="Email" style="height:1.1em; vertical-align:middle;">
+        </p>
+      </section>
+
+    </main>
+
+    <footer>
+      <p>&copy; <span id="year"></span></p>
+      <p>
+        Background photo: <a href="https://commons.wikimedia.org/wiki/File:Cavum,_Bad_Salzhausen_03.jpg">Cavum, Bad Salzhausen 03</a>
+        by <a href="https://commons.wikimedia.org/wiki/User:Cherubino">Cherubino</a>,
+        licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>. Resized from the original.
       </p>
-    </section>
+    </footer>
 
-  </main>
-
-  <footer>
-    <p>&copy; <span id="year"></span></p>
-  </footer>
+  </div>
 
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
